@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Purpose: A shell script to act as a wrapper to the PLC Memory Mapper.  The
+#          command line option runs it in CGI mode.
+# Author:  Paul M. Breen
+# Date:    2002-05-02
+# Usage:   plcmm_cgi
+
+# N.B.: This script should be copied along with the PLC memory mapper (plcmm)
+#       to your web server's cgi-bin directory (or wherever you run cgi scripts
+#       from).  It should be owned by the unpriveledged web user - e.g.,
+#       nobody:nogroup
+
+# Print HTTP headers to tell the browser the content type
+echo "Content-type: text/html"
+echo ""
+
+# Run the PLC Memory Mapper in CGI mode
+./plcmm -c
+
+exit 0

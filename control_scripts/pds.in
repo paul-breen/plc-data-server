@@ -1,0 +1,189 @@
+#!/bin/sh
+
+# Purpose: A start/stop shell script for the PLC data server 
+# Author:  Paul M. Breen
+# Date:    1999-08-24
+# Usage:   pds {start|stop|restart|status|startd [1-4]} 
+
+SERVER_DIR="@prefix@"             # Path to the server root
+BIN_DIR="$SERVER_DIR/bin"         # Path to the server binaries dir
+DATA_DIR="$SERVER_DIR/data"       # Path to the server's tags config file
+PROGRAM="pdsd"                    # The server process
+
+USE_NWSTUB="@USE_NWSTUB@"         # Also start the network stub on PDS start
+NWSTUB_HOST="@NWSTUB_HOST@"       # The network stub host
+NWSTUB_PORT="@NWSTUB_PORT@"       # The network stub port
+NWSTUB_PROGRAM="pds_nwstubd"      # The network stub server process
+
+###############################################################################
+# Start the given service
+###############################################################################
+function start_service()
+{
+  local service_path="$1"; shift
+  local service_title="$1"; shift
+  local service_name=`basename "$service_path"`
+
+  if [ -x "$service_path" ]
+  then
+    # Check if service is already running
+    local running=`ps ax | grep "$service_name" | grep -v grep | wc -l`
+
+    if [ "$running" -gt 0 ]
+    then
+      echo "$service_title already running?"
+      return 1
+    else
+      echo "Starting $service_title"
+      $@ &
+      return 0
+    fi
+  else
+    echo "Cannot run or locate ${service_title}!"
+    return 1
+  fi
+}
+
+
+
+###############################################################################
+# Stop the given service
+###############################################################################
+function stop_service()
+{
+  local service_path="$1"; shift
+  local service_title="$1"; shift
+  local service_name=`basename "$service_path"`
+  local pid
+
+  # Check if service is already running
+  local running=`ps ax | grep "$service_name" | grep -v grep | wc -l`
+
+  if [ "$running" -gt 0 ]
+  then
+    running=`ps ax | grep "$service_name" | grep -v grep | cut -c1-5 | sort -r`
+
+    echo "Stopping $service_title"
+
+    for pid in $running
+    do 
+      kill -s TERM $pid
+    done
+    return 0
+  else
+    echo "$service_title not running?"
+    return 1
+  fi
+}
+
+
+
+###############################################################################
+# Report the Status of the given service
+###############################################################################
+function report_service_status()
+{
+  local service_path="$1"; shift
+  local service_title="$1"; shift
+  local service_name=`basename "$service_path"`
+
+  if [ -x "$service_path" ]
+  then
+    # N.B.:  According to the LSB (Linux Standards Base), a call to status
+    #        should return the following:
+    # 0 - service running
+    # 1 - service dead, but /var/run/  pid  file exists
+    # 2 - service dead, but /var/lock/ lock file exists
+    # 3 - service not running
+
+    # Check if service is already running
+    local running=`ps ax | grep "$service_name" | grep -v grep | wc -l`
+
+    if [ "$running" -gt 0 ]
+    then
+      echo "$service_title is running..."
+      return 0
+    else
+      echo "$service_title is not running..."
+      return 3
+    fi
+  else
+    echo "Cannot run or locate ${service_title}!"
+    return 3
+  fi
+}
+
+
+
+###############################################################################
+# Main function
+###############################################################################
+
+retval=0
+
+# Control the PDS and optionally the PDS network stub
+case "$1" in
+  start)                          # Start the service
+    start_service "$BIN_DIR/$PROGRAM" "PLC data server" "$BIN_DIR/$PROGRAM" -D "$DATA_DIR"
+    retval=$?
+
+    if [ "${USE_NWSTUB:-false}" = "true" ]
+    then
+      start_service "$BIN_DIR/$NWSTUB_PROGRAM" "PLC data server network stub" "$BIN_DIR/$NWSTUB_PROGRAM" ${NWSTUB_HOST:+ -h "${NWSTUB_HOST}"} ${NWSTUB_PORT:+ -p "${NWSTUB_PORT}"}
+      let "retval |= $retval"
+    fi
+
+    exit $retval
+  ;;
+  stop)                           # Stop the service
+    if [ "${USE_NWSTUB:-false}" = "true" ]
+    then
+      stop_service "$BIN_DIR/$NWSTUB_PROGRAM" "PLC data server network stub"
+      retval=$?
+    fi
+
+    stop_service "$BIN_DIR/$PROGRAM" "PLC data server"
+    let "retval |= $retval"
+
+    exit $retval
+  ;;
+  restart)                        # Restart the service
+    $0 stop
+    sleep 2
+    $0 start
+    exit 0
+  ;;
+  status)                         # Report the status of the service
+    report_service_status "$BIN_DIR/$PROGRAM" "PLC data server"
+    retval=$?
+
+    if [ "${USE_NWSTUB:-false}" = "true" ]
+    then
+      report_service_status "$BIN_DIR/$NWSTUB_PROGRAM" "PLC data server network stub"
+      let "retval |= $retval"
+    fi
+
+    exit $retval
+  ;;
+  startd)                         # Start the service (in debug mode)
+    # Check if an optional debug level was passed
+    test $# -gt 1 && shift 1 && debug_level="$1" || debug_level=1
+
+    start_service "$BIN_DIR/$PROGRAM" "PLC data server" "$BIN_DIR/$PROGRAM" -D "$DATA_DIR" -d"$debug_level"
+    retval=$?
+
+    if [ "${USE_NWSTUB:-false}" = "true" ]
+    then
+      start_service "$BIN_DIR/$NWSTUB_PROGRAM" "PLC data server network stub" "$BIN_DIR/$NWSTUB_PROGRAM" -d"$debug_level" ${NWSTUB_HOST:+ -h "${NWSTUB_HOST}"} ${NWSTUB_PORT:+ -p "${NWSTUB_PORT}"}
+      let "retval |= $retval"
+    fi
+
+    exit $retval
+  ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status|startd [1-4]}"
+    exit 1
+esac
+
+exit $retval
+

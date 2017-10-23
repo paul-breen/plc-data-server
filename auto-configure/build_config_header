@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Purpose: A shell script to generate the configuration header input file
+#          for the PLC data server.
+#          This is done by running 'autoheader' on the toplevel configuration
+#          input file 'configure.in'
+# Author:  Paul M. Breen
+# Date:    2001-06-26
+# Usage:   ./build_config_header
+
+SRCDIR=..                         # Path to the source dir
+CONFIG_IN="pds_config.h.in"       # Filename of the config. header input file
+
+autoheader "$SRCDIR"/configure.in 1> "$SRCDIR"/include/"$CONFIG_IN"

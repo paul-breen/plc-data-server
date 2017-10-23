@@ -1,0 +1,129 @@
+<HTML>
+<HEAD>
+<TITLE>PLC Data Server</TITLE>
+<LINK REL=STYLESHEET TYPE="text/css" HREF="pds.css">
+</HEAD>
+
+<BODY CLASS=mainText>
+<H1>PLC Data Server</H1>
+<H2>Program information</H2>
+<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=2 CELLSPACING=0 FRAME=RHS RULES=COLS>
+	<COL WIDTH=9*>
+	<COL WIDTH=79*>
+	<COL WIDTH=168*>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P>Name</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P>pdsd</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Configuration File</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">plc.cnf</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Log File</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">pds.log</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Executable directory</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">$PDSHOME/bin</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Source Directory</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">$PDSHOME/server</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Log Directory</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">"data-directory"</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Written in</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">C</P>
+		</TD>
+	</TR>
+</TABLE>
+
+<H2>Outline</H2>
+<P>The <A HREF="pds_glossary.html#pds">PLC Data Server</A> (PDS) makes PLC data available to client programs through a simple <A HREF="pds_c_api.html">Application Programming Interface</A> (API).</P>
+
+<H2>Method</H2>
+<P>The PDS reads in its <A HREF="plcconfig.phtml">configuration file</A> and based on the contents, sets up memory structures to hold data for PLC coils, holding registers etc.
+<P>The PDS then splits into two distinct processes, one to handle all read requests for PLC data and one to handle all requests to write data to a PLC.  In this way the PDS is a concurrent read/write server.
+<P>The read process sets up a ModBus query for all read/mapped-write blocks found in the configuration file and sits in a continuous loop, running in turn the queries against the PLC.  It uses the data returned by the PLC to populate a shared memory segment.
+<P>The write process sits polling a message queue and when it receives a request from a client program to write data to the PLC, it constructs the ModBus query and sends it to the PLC.
+<P>All communications between the PDS and a PLC is via ModBus over TCP/IP.
+All communications between a client program and the PDS is via UNIX <A HREF="pds_glossary.html#pds_ipc_resources">Inter-Process Communication</A> (IPC).
+A client reads PLC data by accessing the PDS's shared memory segment (controlled by semaphores).
+A client writes data to the PLC by sending a message on a message queue to the PDS.
+
+<P>
+<CENTER>
+<TABLE HEIGHT="60" BORDER="3" BGCOLOR="#C0C0C0"><TR>
+<TD ALIGN="CENTER" COLSTART="1" HEIGHT="40" WIDTH="140"><A HREF="index.html">Back to PLC Data Server Overview</A></TD>
+<TD ALIGN="CENTER" COLSTART="2" HEIGHT="40" WIDTH="140">&nbsp</TD>
+<TD ALIGN="CENTER" COLSTART="3" HEIGHT="40" WIDTH="140">&nbsp</TD>
+<TD ALIGN="CENTER" COLSTART="4" HEIGHT="40" WIDTH="140">&nbsp</TD>
+<TD ALIGN="CENTER" COLSTART="5" HEIGHT="40" WIDTH="140">&nbsp</TD>
+</TR> 
+</TABLE>
+</CENTER>
+
+<H6>Last updated on 2000-06-06<BR>
+Paul M. Breen</H6><BR>
+</BODY>
+</HTML>
+

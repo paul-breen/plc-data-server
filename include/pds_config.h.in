@@ -1,0 +1,96 @@
+/* include/pds_config.h.in.  Generated automatically from ../configure.in by autoheader.  */
+/******************************************************************************
+* PROJECT:  PLC data server                                                   * 
+* MODULE:   pds_config.h                                                      *
+* PURPOSE:  Autoconf generated configuration header for the PLC data server   *
+* AUTHOR:   Paul M. Breen                                                     *
+* DATE:     2001-06-20                                                        *
+******************************************************************************/
+
+#ifndef __PDS_CONFIG_H
+#define __PDS_CONFIG_H
+
+/******************************************************************************
+* Defines                                                                     *
+******************************************************************************/
+
+/* Define the current PDS Version string */
+#define PDS_VERSION	@PDS_VERSION@
+
+/* Define to empty if the keyword does not work.  */
+#undef const
+
+/* Define if you have the ANSI # stringizing operator in cpp. */
+#undef HAVE_STRINGIZE
+
+/* Define if you have <sys/wait.h> that is POSIX.1 compatible.  */
+#undef HAVE_SYS_WAIT_H
+
+/* Define to `int' if <sys/types.h> doesn't define.  */
+#undef mode_t
+
+/* Define to `int' if <sys/types.h> doesn't define.  */
+#undef pid_t
+
+/* Define as the return type of signal handlers (int or void).  */
+#undef RETSIGTYPE
+
+/* Define to `unsigned' if <sys/types.h> doesn't define.  */
+#undef size_t
+
+/* Define if you have the ANSI C header files.  */
+#undef STDC_HEADERS
+
+/* Define if you can safely include both <sys/time.h> and <time.h>.  */
+#undef TIME_WITH_SYS_TIME
+
+/* Define if your <sys/time.h> declares struct tm.  */
+#undef TM_IN_SYS_TIME
+
+/* Define if you have the <arpa/inet.h> header file.  */
+#undef HAVE_ARPA_INET_H
+
+/* Define if you have the <curses.h> header file.  */
+#undef HAVE_CURSES_H
+
+/* Define if you have the <getopt.h> header file.  */
+#undef HAVE_GETOPT_H
+
+/* Define if you have the <netdb.h> header file.  */
+#undef HAVE_NETDB_H
+
+/* Define if you have the <netinet/in.h> header file.  */
+#undef HAVE_NETINET_IN_H
+
+/* Define if you have the <signal.h> header file.  */
+#undef HAVE_SIGNAL_H
+
+/* Define if you have the <sys/ipc.h> header file.  */
+#undef HAVE_SYS_IPC_H
+
+/* Define if you have the <sys/msg.h> header file.  */
+#undef HAVE_SYS_MSG_H
+
+/* Define if you have the <sys/select.h> header file.  */
+#undef HAVE_SYS_SELECT_H
+
+/* Define if you have the <sys/sem.h> header file.  */
+#undef HAVE_SYS_SEM_H
+
+/* Define if you have the <sys/shm.h> header file.  */
+#undef HAVE_SYS_SHM_H
+
+/* Define if you have the <sys/time.h> header file.  */
+#undef HAVE_SYS_TIME_H
+
+/* Define if you have the <sys/types.h> header file.  */
+#undef HAVE_SYS_TYPES_H
+
+/* Define if you have the <termios.h> header file.  */
+#undef HAVE_TERMIOS_H
+
+/* Define if you have the <unistd.h> header file.  */
+#undef HAVE_UNISTD_H
+
+#endif
+

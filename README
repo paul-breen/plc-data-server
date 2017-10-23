@@ -1,0 +1,5 @@
+To run the PDS, 'cd' to the bin directory (under install directory) and run
+the PDS control script.
+To start the PDS type 'pds start', to stop the PDS type 'pds stop'.
+An example PLC configuration file has been provided as a template for your
+own configuration and is located in the data directory.

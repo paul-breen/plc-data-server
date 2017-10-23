@@ -1,0 +1,841 @@
+# Project: PLC data server
+# Purpose: PLC Communications Configuration File
+# Author:  Paul M. Breen
+# Date:    2003-01-29
+#
+# Format:  /protocol/function/path/IP_address:port/base_address/poll_rate
+# OR       /protocol/function/path/"tty_device"/base_address/poll_rate
+#          <white space>tagname tagreference wordlength
+
+###############################################################################
+# Section 1: PLC heartbeats
+###############################################################################
+
+###############################################################################
+# Newtec 1 PLC - Modicon Premium 
+###############################################################################
+/MB_TCPIP/BREAD/0/10.4.12.131:502/000000/1000
+	heartbeat_read_plc1		000682	0
+
+/MB_TCPIP/BWRITE/0/10.4.12.131:502/000000/1000
+	heartbeat_write_plc1		000682	0
+
+###############################################################################
+# Newtec 2 PLC - Modicon Premium 
+###############################################################################
+/MB_TCPIP/BREAD/0/10.4.12.132:502/000000/1000
+	heartbeat_read_plc2		000682	0
+
+/MB_TCPIP/BWRITE/0/10.4.12.132:502/000000/1000
+	heartbeat_write_plc2		000682	0
+
+###############################################################################
+# Newtec 3 PLC - Modicon Premium 
+###############################################################################
+/MB_TCPIP/BREAD/0/10.4.12.133:502/000000/1000
+	heartbeat_read_plc3		000682	0
+
+/MB_TCPIP/BWRITE/0/10.4.12.133:502/000000/1000
+	heartbeat_write_plc3		000682	0
+
+###############################################################################
+# Newtec 4 PLC - Modicon Premium 
+###############################################################################
+/MB_TCPIP/BREAD/0/10.4.12.134:502/000000/1000
+	heartbeat_read_plc4		000682	0
+
+/MB_TCPIP/BWRITE/0/10.4.12.134:502/000000/1000
+	heartbeat_write_plc4		000682	0
+
+###############################################################################
+# Newtec 5 PLC - Modicon Premium 
+###############################################################################
+/MB_TCPIP/BREAD/0/10.4.12.135:502/000000/1000
+	heartbeat_read_plc5		000682	0
+
+/MB_TCPIP/BWRITE/0/10.4.12.135:502/000000/1000
+	heartbeat_write_plc5		000682	0
+
+###############################################################################
+# Newtec 6 PLC - Modicon Premium 
+###############################################################################
+/MB_TCPIP/BREAD/0/10.4.12.136:502/000000/1000
+	heartbeat_read_plc6		000682	0
+
+/MB_TCPIP/BWRITE/0/10.4.12.136:502/000000/1000
+	heartbeat_write_plc6		000682	0
+
+###############################################################################
+# Newtec 7 PLC - Modicon Premium 
+###############################################################################
+/MB_TCPIP/BREAD/0/10.4.12.137:502/000000/1000
+	heartbeat_read_plc7		000682	0
+
+/MB_TCPIP/BWRITE/0/10.4.12.137:502/000000/1000
+	heartbeat_write_plc7		000682	0
+
+###############################################################################
+# Unitech 1 PLC - Modicon Premium 
+###############################################################################
+/MB_TCPIP/BREAD/0/10.4.12.138:502/000000/1000
+	heartbeat_read_plc8		000111	0
+
+/MB_TCPIP/BWRITE/0/10.4.12.138:502/000000/1000
+	heartbeat_write_plc8		000111	0
+
+###############################################################################
+# Unitech 2 PLC - Modicon Premium 
+###############################################################################
+/MB_TCPIP/BREAD/0/10.4.12.139:502/000000/1000
+	heartbeat_read_plc9		000111	0
+
+/MB_TCPIP/BWRITE/0/10.4.12.139:502/000000/1000
+	heartbeat_write_plc9		000111	0
+
+###############################################################################
+# Kister PLC - Allen Bradley RS Logix 
+###############################################################################
+#/CIP_TCPIP/BREAD/1.0/10.4.12.140:44818/MVMS_COMMS_WRITE0/1000
+#	heartbeat_read_plc10		0	0
+#
+#/CIP_TCPIP/BWRITE/1.0/10.4.12.140:44818/MVMS_COMMS_WRITE0/1000
+#	heartbeat_write_plc10		0	0
+
+###############################################################################
+# Section 2: PLC control & data
+###############################################################################
+
+###############################################################################
+# Unitech 1 PLC - Modicon Premium 
+###############################################################################
+/MB_TCPIP/BREAD/0/10.4.12.138:502/000000/1000
+	change_order_ack		000207	0
+	new_order_ack			000217	0
+	suspend_order_ack		000218	0
+	resume_order_ack		000219	0
+	complete_order_ack		000220	0
+	can_count_target_reached	000221	0
+	change_modules_ack		000222	0
+	change_quantity_ack		000223	0
+
+/MB_TCPIP/BWRITE/0/10.4.12.138:502/000000/1000
+	new_order_req			000101	0
+	suspend_order_req		000102	0
+	resume_order_req		000103	0
+	complete_order_req		000104	0
+	change_modules_req		000105	0
+	change_quantity_req		000106	0
+	change_order_req		000107	0
+
+/MB_TCPIP/WWRITE/0/10.4.12.138:502/400000/1000
+        new_prod_write_qty_l		401003  16
+        new_prod_write_qty_h		401004  16
+        new_prod_write_sap_1		401005  16
+        new_prod_write_sap_2		401006  16
+        new_prod_write_sap_3		401007  16
+        new_prod_write_sap_4		401008  16
+        new_prod_write_sap_5		401009  16
+        new_prod_write_sap_6		401010  16
+        new_prod_write_src_mod		401011  16
+        new_prod_write_shutdown 	401012  16
+	change_src_mod_write		401013	16
+	change_src_shut_write		401014	16
+	new_quantity_write_l		401015	16
+	new_quantity_write_h		401016	16
+        change_prod_write_sap_1		401033  16
+        change_prod_write_sap_2		401034  16
+        change_prod_write_sap_3		401035  16
+        change_prod_write_sap_4		401036  16
+        change_prod_write_sap_5		401037  16
+        change_prod_write_sap_6		401038  16
+ 
+/MB_TCPIP/WREAD/0/10.4.12.138:502/400000/1000
+        new_prod_read_qty_l		401203  16
+        new_prod_read_qty_h		401204  16
+        new_prod_read_sap_1		401205  16
+        new_prod_read_sap_2		401206  16
+        new_prod_read_sap_3		401207  16
+        new_prod_read_sap_4		401208  16
+        new_prod_read_sap_5		401209  16
+        new_prod_read_sap_6		401210  16
+        new_prod_read_src_mod		401211  16
+        new_prod_read_shutdown 		401212  16
+	change_src_mod_read		401213	16
+	change_src_shut_read		401214	16
+	new_quantity_read_l		401215	16
+	new_quantity_read_h		401216	16
+	mod2_lab1_count_l		401217	16
+	mod2_lab1_count_h		401218	16
+	mod2_lab2_count_l		401219	16
+	mod2_lab2_count_h		401220	16
+	mod3_lab1_count_l		401221	16
+	mod3_lab1_count_h		401222	16
+	mod3_lab2_count_l		401223	16
+	mod3_lab2_count_h		401224	16
+	mod3_lab3_count_l		401225	16
+	mod3_lab3_count_h		401226	16
+	mod2_tot_count_l		401227	16
+	mod2_tot_count_h		401228	16
+	mod3_tot_count_l		401229	16
+	mod3_tot_count_h		401230	16
+	palletiser_status		401231	16
+        change_prod_read_sap_1		401233  16
+        change_prod_read_sap_2		401234  16
+        change_prod_read_sap_3		401235  16
+        change_prod_read_sap_4		401236  16
+        change_prod_read_sap_5		401237  16
+        change_prod_read_sap_6		401238  16
+	current_target_l		401241	16
+	current_target_h		401242	16
+
+###############################################################################
+# Newtec 1 PLC - Modicon Premium 
+###############################################################################
+/MB_TCPIP/BWRITE/0/10.4.12.131:502/000000/1000
+	new_mod_order_req_new1		000601	0
+	system_clear_ack_new1		000604	0
+	new_max_layers_req_new1		000605	0
+	eject_pallet_data_ack1		000608	0
+	layer_complete_ack1		000610	0
+
+/MB_TCPIP/BREAD/0/10.4.12.131:502/000000/1000
+	new_mod_order_ack_new1		000702	0
+	system_clear_req_new1		000703	0
+	new_max_layers_ack_new1		000706	0
+	eject_pallet_data_avail1	000707	0
+	layer_complete1			000709	0
+
+/MB_TCPIP/WREAD/0/10.4.12.131:502/400000/1000
+	new_mod_order_read_item1_1	402401	16
+	new_mod_order_read_item2_1	402402	16
+	new_mod_order_read_item3_1	402403	16
+	new_mod_order_read_item4_1	402404	16
+        new_mod_order_read_sap_no1_1	402405  16
+        new_mod_order_read_sap_no2_1	402406  16
+        new_mod_order_read_sap_no3_1	402407  16
+        new_mod_order_read_sap_no4_1	402408  16
+        new_mod_order_read_sap_no5_1	402409  16
+        new_mod_order_read_sap_no6_1	402410  16
+        new_mod_order_read_bbf_month_1	402411  16
+        new_mod_order_read_bbf_year_1	402412  16
+        new_mod_order_read_max_layers_1	402413  16
+        new_mod_order_read_prod_type_1	402414  16
+	new_max_layers_read_qty1	402431	16
+	eject_pallet_base_urn1		402436	16
+	eject_pallet_seq1		402437	16
+	eject_itemcode1_1		402438	16
+	eject_itemcode2_1		402439	16
+	eject_itemcode3_1		402440	16
+	eject_itemcode4_1		402441	16
+	eject_sap_no1_1			402442	16
+	eject_sap_no2_1			402443	16
+	eject_sap_no3_1			402444	16
+	eject_sap_no4_1			402445	16
+	eject_sap_no5_1			402446	16
+	eject_sap_no6_1			402447	16
+	eject_layer_count_1		402448	16
+	eject_sample1_1			402449	16
+	eject_sample2_1			402450	16
+	eject_eject_code_1		402451	16
+	eject_error_code_1		402452	16
+	eject_read_destlane_1		402453	16
+	eject_read_dbno_1		402454	16
+	layer_count1			402461	16
+	layer_read_response1		402462	16
+
+/MB_TCPIP/WWRITE/0/10.4.12.131:502/400000/1000
+	new_mod_order_write_item1_1		402501	16
+	new_mod_order_write_item2_1		402502	16
+	new_mod_order_write_item3_1		402503	16
+	new_mod_order_write_item4_1		402504	16
+        new_mod_order_write_sap_no1_1		402505  16
+        new_mod_order_write_sap_no2_1		402506  16
+        new_mod_order_write_sap_no3_1		402507  16
+        new_mod_order_write_sap_no4_1		402508  16
+        new_mod_order_write_sap_no5_1		402509  16
+        new_mod_order_write_sap_no6_1		402510  16
+        new_mod_order_write_bbf_month_1		402511  16
+        new_mod_order_write_bbf_year_1		402512  16
+        new_mod_order_write_max_layers_1	402513  16
+        new_mod_order_write_prod_type_1		402514  16
+	new_max_layers_write_qty1		402531	16
+	eject_write_destlane_1			402553	16
+	eject_write_dbno_1			402554	16
+	layer_write_response1			402562	16
+
+###############################################################################
+# Newtec 2 PLC - Modicon Premium 
+###############################################################################
+/MB_TCPIP/BWRITE/0/10.4.12.132:502/000000/1000
+	new_mod_order_req_new2		000601	0
+	system_clear_ack_new2		000604	0
+	new_max_layers_req_new2		000605	0
+	eject_pallet_data_ack2		000608	0
+	layer_complete_ack2		000610	0
+
+/MB_TCPIP/BREAD/0/10.4.12.132:502/000000/1000
+	new_mod_order_ack_new2		000702	0
+	system_clear_req_new2		000703	0
+	new_max_layers_ack_new2		000706	0
+	eject_pallet_data_avail2	000707	0
+	layer_complete2			000709	0
+
+/MB_TCPIP/WREAD/0/10.4.12.132:502/400000/1000
+	new_mod_order_read_item1_2	402401	16
+	new_mod_order_read_item2_2	402402	16
+	new_mod_order_read_item3_2	402403	16
+	new_mod_order_read_item4_2	402404	16
+        new_mod_order_read_sap_no1_2	402405  16
+        new_mod_order_read_sap_no2_2	402406  16
+        new_mod_order_read_sap_no3_2	402407  16
+        new_mod_order_read_sap_no4_2	402408  16
+        new_mod_order_read_sap_no5_2	402409  16
+        new_mod_order_read_sap_no6_2	402410  16
+        new_mod_order_read_bbf_month_2	402411  16
+        new_mod_order_read_bbf_year_2	402412  16
+        new_mod_order_read_max_layers_2	402413  16
+        new_mod_order_read_prod_type_2	402414  16
+	new_max_layers_read_qty2	402431	16
+	eject_pallet_base_urn2		402436	16
+	eject_pallet_seq2		402437	16
+	eject_itemcode1_2		402438	16
+	eject_itemcode2_2		402439	16
+	eject_itemcode3_2		402440	16
+	eject_itemcode4_2		402441	16
+	eject_sap_no1_2			402442	16
+	eject_sap_no2_2			402443	16
+	eject_sap_no3_2			402444	16
+	eject_sap_no4_2			402445	16
+	eject_sap_no5_2			402446	16
+	eject_sap_no6_2			402447	16
+	eject_layer_count_2		402448	16
+	eject_sample1_2			402449	16
+	eject_sample2_2			402450	16
+	eject_eject_code_2		402451	16
+	eject_error_code_2		402452	16
+	eject_read_destlane_2		402453	16
+	eject_read_dbno_2		402454	16
+	layer_count2			402461	16
+	layer_read_response2		402462	16
+
+/MB_TCPIP/WWRITE/0/10.4.12.132:502/400000/1000
+	new_mod_order_write_item1_2		402501	16
+	new_mod_order_write_item2_2		402502	16
+	new_mod_order_write_item3_2		402503	16
+	new_mod_order_write_item4_2		402504	16
+        new_mod_order_write_sap_no1_2		402505  16
+        new_mod_order_write_sap_no2_2		402506  16
+        new_mod_order_write_sap_no3_2		402507  16
+        new_mod_order_write_sap_no4_2		402508  16
+        new_mod_order_write_sap_no5_2		402509  16
+        new_mod_order_write_sap_no6_2		402510  16
+        new_mod_order_write_bbf_month_2		402511  16
+        new_mod_order_write_bbf_year_2		402512  16
+        new_mod_order_write_max_layers_2	402513  16
+        new_mod_order_write_prod_type_2		402514  16
+	new_max_layers_write_qty2		402531	16
+	eject_write_destlane_2			402553	16
+	eject_write_dbno_2			402554	16
+	layer_write_response2			402562	16
+
+###############################################################################
+# Newtec 4 PLC - Modicon Premium 
+###############################################################################
+/MB_TCPIP/BWRITE/0/10.4.12.134:502/000000/1000
+	new_lane_ack			000602	0
+	transfer_ack_lane_1		000613	0
+	transfer_ack_lane_2		000615	0
+	transfer_ack_lane_3		000617	0
+	transfer_ack_lane_4		000619	0
+	transfer_ack_lane_5		000621	0
+	transfer_ack_lane_6		000623	0
+	transfer_ack_lane_7		000625	0
+	transfer_ack_lane_8		000627	0
+	prebuffer_reject_ack		000632	0
+	prebuffer_infeed_ack		000634	0
+	exitbuffer_dest_req_1		000641	0
+	exitbuffer_dest_req_2		000643	0
+	exitbuffer_dest_req_3		000645	0
+	exitbuffer_dest_req_4		000647	0
+	exitbuffer_dest_req_5		000649	0
+	exitbuffer_dest_req_6		000651	0
+	exitbuffer_dest_req_7		000653	0
+	exitbuffer_dest_req_8		000655	0
+	lane_outfeed_ack_lane_1		000662	0
+	lane_outfeed_ack_lane_2		000664	0
+	lane_outfeed_ack_lane_3		000666	0
+	lane_outfeed_ack_lane_4		000668	0
+	lane_outfeed_ack_lane_5		000670	0
+	lane_outfeed_ack_lane_6		000672	0
+	lane_outfeed_ack_lane_7		000674	0
+	lane_outfeed_ack_lane_8		000676	0
+
+/MB_TCPIP/BREAD/0/10.4.12.134:502/000000/1000
+	new_lane_req			000701	0
+	transfer_req_lane_1		000711	0
+	transfer_req_lane_2		000714	0
+	transfer_req_lane_3		000716	0
+	transfer_req_lane_4		000718	0
+	transfer_req_lane_5		000720	0
+	transfer_req_lane_6		000722	0
+	transfer_req_lane_7		000724	0
+	transfer_req_lane_8		000726	0
+	prebuffer_reject_req		000731	0
+	prebuffer_infeed_req		000733	0
+	exitbuffer_dest_ack_1		000742	0
+	exitbuffer_dest_ack_2		000744	0
+	exitbuffer_dest_ack_3		000746	0
+	exitbuffer_dest_ack_4		000748	0
+	exitbuffer_dest_ack_5		000750	0
+	exitbuffer_dest_ack_6		000752	0
+	exitbuffer_dest_ack_7		000754	0
+	exitbuffer_dest_ack_8		000756	0
+	lane_outfeed_req_lane_1		000761	0
+	lane_outfeed_req_lane_2		000763	0
+	lane_outfeed_req_lane_3		000765	0
+	lane_outfeed_req_lane_4		000767	0
+	lane_outfeed_req_lane_5		000769	0
+	lane_outfeed_req_lane_6		000771	0
+	lane_outfeed_req_lane_7		000773	0
+	lane_outfeed_req_lane_8		000775	0
+
+/MB_TCPIP/WREAD/0/10.4.12.134:502/400000/1000
+	plc_buffer_lane_status		402401	16
+	new_lane_read_base_urn		402411	16
+	new_lane_read_old_lane		402412	16
+	new_lane_read_new_lane		402413	16
+	transfer_base_lane_1		402421	16
+	transfer_base_lane_2		402422	16
+	transfer_base_lane_3		402423	16
+	transfer_base_lane_4		402424	16
+	transfer_base_lane_5		402425	16
+	transfer_base_lane_6		402426	16
+	transfer_base_lane_7		402427	16
+	transfer_base_lane_8		402428	16
+	prebuffer_reject_base_urn	402441	16
+	prebuffer_reject_error_code	402442	16
+	prebuffer_infeed_base_urn	402451	16
+	prebuffer_infeed_read_lane	402452	16
+	prebuffer_infeed_contents_type	402453	16
+	exitbuffer_base_urn_lane1	402462	16
+	exitbuffer_base_urn_lane2	402463	16
+	exitbuffer_base_urn_lane3	402464	16
+	exitbuffer_base_urn_lane4	402465	16
+	exitbuffer_base_urn_lane5	402466	16
+	exitbuffer_base_urn_lane6	402467	16
+	exitbuffer_base_urn_lane7	402468	16
+	exitbuffer_base_urn_lane8	402469	16
+	buffer_lane_infeed_status	402406	16
+
+/MB_TCPIP/WREAD/0/10.4.12.134:502/400000/1000
+	exitbuffer_dest_read_lane1	402471	16
+	exitbuffer_action_read_lane1	402472	16
+	exitbuffer_layers_read_lane1	402473	16
+	exitbuffer_rdest_read_lane1	402474	16
+	exitbuffer_rlayers_read_lane1	402475	16
+	exitbuffer_dest_read_lane2	402481	16
+	exitbuffer_action_read_lane2	402482	16
+	exitbuffer_layers_read_lane2	402483	16
+	exitbuffer_rdest_read_lane2	402484	16
+	exitbuffer_rlayers_read_lane2	402485	16
+	exitbuffer_dest_read_lane3	402491	16
+	exitbuffer_action_read_lane3	402492	16
+	exitbuffer_layers_read_lane3	402493	16
+	exitbuffer_rdest_read_lane3	402494	16
+	exitbuffer_rlayers_read_lane3	402495	16
+	exitbuffer_dest_read_lane4	402501	16
+	exitbuffer_action_read_lane4	402502	16
+	exitbuffer_layers_read_lane4	402503	16
+	exitbuffer_rdest_read_lane4	402504	16
+	exitbuffer_rlayers_read_lane4	402505	16
+	exitbuffer_dest_read_lane5	402511	16
+	exitbuffer_action_read_lane5	402512	16
+	exitbuffer_layers_read_lane5	402513	16
+	exitbuffer_rdest_read_lane5	402514	16
+	exitbuffer_rlayers_read_lane5	402515	16
+	exitbuffer_dest_read_lane6	402521	16
+	exitbuffer_action_read_lane6	402522	16
+	exitbuffer_layers_read_lane6	402523	16
+	exitbuffer_rdest_read_lane6	402524	16
+	exitbuffer_rlayers_read_lane6	402525	16
+	exitbuffer_dest_read_lane7	402531	16
+	exitbuffer_action_read_lane7	402532	16
+	exitbuffer_layers_read_lane7	402533	16
+	exitbuffer_rdest_read_lane7	402534	16
+	exitbuffer_rlayers_read_lane7	402535	16
+	exitbuffer_dest_read_lane8	402541	16
+	exitbuffer_action_read_lane8	402542	16
+	exitbuffer_layers_read_lane8	402543	16
+	exitbuffer_rdest_read_lane8	402544	16
+	exitbuffer_rlayers_read_lane8	402545	16
+
+/MB_TCPIP/WREAD/0/10.4.12.134:502/400000/1000
+	lane_outfeed_base_lane_1	402551	16
+	lane_outfeed_base_lane_2	402552	16
+	lane_outfeed_base_lane_3	402553	16
+	lane_outfeed_base_lane_4	402554	16
+	lane_outfeed_base_lane_5	402555	16
+	lane_outfeed_base_lane_6	402556	16
+	lane_outfeed_base_lane_7	402557	16
+	lane_outfeed_base_lane_8	402558	16
+
+/MB_TCPIP/WWRITE/0/10.4.12.134:502/400000/1000
+	new_lane_write_new_lane		402713	16
+	prebuffer_infeed_write_lane	402752	16
+
+/MB_TCPIP/WWRITE/0/10.4.12.134:502/400000/1000
+	exitbuffer_dest_write_lane1	402771	16
+	exitbuffer_action_write_lane1	402772	16
+	exitbuffer_layers_write_lane1	402773	16
+	exitbuffer_rdest_write_lane1	402774	16
+	exitbuffer_rlayers_write_lane1	402775	16
+	exitbuffer_dest_write_lane2	402781	16
+	exitbuffer_action_write_lane2	402782	16
+	exitbuffer_layers_write_lane2	402783	16
+	exitbuffer_rdest_write_lane2	402784	16
+	exitbuffer_rlayers_write_lane2	402785	16
+	exitbuffer_dest_write_lane3	402791	16
+	exitbuffer_action_write_lane3	402792	16
+	exitbuffer_layers_write_lane3	402793	16
+	exitbuffer_rdest_write_lane3	402794	16
+	exitbuffer_rlayers_write_lane3	402795	16
+	exitbuffer_dest_write_lane4	402801	16
+	exitbuffer_action_write_lane4	402802	16
+	exitbuffer_layers_write_lane4	402803	16
+	exitbuffer_rdest_write_lane4	402804	16
+	exitbuffer_rlayers_write_lane4	402805	16
+	exitbuffer_dest_write_lane5	402811	16
+	exitbuffer_action_write_lane5	402812	16
+	exitbuffer_layers_write_lane5	402813	16
+	exitbuffer_rdest_write_lane5	402814	16
+	exitbuffer_rlayers_write_lane5	402815	16
+	exitbuffer_dest_write_lane6	402821	16
+	exitbuffer_action_write_lane6	402822	16
+	exitbuffer_layers_write_lane6	402823	16
+	exitbuffer_rdest_write_lane6	402824	16
+	exitbuffer_rlayers_write_lane6	402825	16
+	exitbuffer_dest_write_lane7	402831	16
+	exitbuffer_action_write_lane7	402832	16
+	exitbuffer_layers_write_lane7	402833	16
+	exitbuffer_rdest_write_lane7	402834	16
+	exitbuffer_rlayers_write_lane7	402835	16
+	exitbuffer_dest_write_lane8	402841	16
+	exitbuffer_action_write_lane8	402842	16
+	exitbuffer_layers_write_lane8	402843	16
+	exitbuffer_rdest_write_lane8	402844	16
+	exitbuffer_rlayers_write_lane8	402845	16
+
+###############################################################################
+# Newtec 6
+###############################################################################
+/MB_TCPIP/BREAD/0/10.4.12.136:502/000000/1000
+	depall_req_A				000701	0
+	depall_req_B				000703	0
+
+/MB_TCPIP/BWRITE/0/10.4.12.136:502/000000/1000
+	depall_ack_A				000602	0
+	depall_ack_B				000604	0
+
+/MB_TCPIP/WREAD/0/10.4.12.136:502/400000/1000
+	depall_base_urn_A			402411	16
+	depall_layers_left_A			402412	16
+	depall_base_urn_B			402413	16
+	depall_layers_left_B			402414	16
+
+###############################################################################
+# Newtec 7
+###############################################################################
+/MB_TCPIP/BREAD/0/10.4.12.137:502/000000/1000
+	depall_req_C				000701	0
+	depall_req_D				000703	0
+
+/MB_TCPIP/BWRITE/0/10.4.12.137:502/000000/1000
+	depall_ack_C				000602	0
+	depall_ack_D				000604	0
+
+/MB_TCPIP/WREAD/0/10.4.12.137:502/400000/1000
+	depall_base_urn_C			402411	16
+	depall_layers_left_C			402412	16
+	depall_base_urn_D			402413	16
+	depall_layers_left_D			402414	16
+
+###############################################################################
+# Kister PLC - Allen Bradley RS Logix 
+###############################################################################
+#/CIP_TCPIP/LREAD/1.0/10.4.12.140:44818/MVMS_COMMS_READ[]/1000
+#	shrink_packer_states_h		0	16
+#	shrink_packer_states_l		0	16
+#	shrink_packer_error1_h		1	16
+#	shrink_packer_error1_l		1	16
+#	shrink_packer_error2_h		2	16
+#	shrink_packer_error2_l		2	16
+#	shrink_packer_error3_h		3	16
+#	shrink_packer_error3_l		3	16
+#	shrink_packer_error4_h		4	16
+#	shrink_packer_error4_l		4	16
+#	shrink_packer_error5_h		5	16
+#	shrink_packer_error5_l		5	16
+#	shrink_packer_error6_h		6	16
+#	shrink_packer_error6_l		6	16
+#	shrink_packer_error7_h		7	16
+#	shrink_packer_error7_l		7	16
+#	shrink_packer_error8_h		8	16
+#	shrink_packer_error8_l		8	16
+#	shrink_packer_info1_h		9	16
+#	shrink_packer_info1_l		9	16
+#	shrink_packer_info2_h		10	16
+#	shrink_packer_info2_l		10	16
+#	shrink_packer_info3_h		11	16
+#	shrink_packer_info3_l		11	16
+#	shrink_packer_info4_h		12	16
+#	shrink_packer_info4_l		12	16
+#	shrink_packer_info5_h		13	16
+#	shrink_packer_info5_l		13	16
+#	shrink_packer_info6_h		14	16
+#	shrink_packer_info6_l		14	16
+#	shrink_packer_info7_h		15	16
+#	shrink_packer_info7_l		15	16
+#	shrink_packer_info8_h		16	16
+#	shrink_packer_info8_l		16	16
+#	shrink_packer_pack_format_h	17	16
+#	shrink_packer_pack_format_l	17	16
+#	shrink_packer_pack_count_h	18	16
+#	shrink_packer_pack_count_l	18	16
+#	shrink_packer_run_hours_h	19	16
+#	shrink_packer_run_hours_l	19	16
+#	shrink_packer_speed_h		20	16
+#	shrink_packer_speed_l		20	16
+#	tray_packer_states_h		21	16
+#	tray_packer_states_l		21	16
+#	tray_packer_tray_count_h	22	16
+#	tray_packer_tray_count_l	22	16
+#	tray_packer_speed_h		23	16
+#	tray_packer_speed_l		23	16
+#
+#/CIP_TCPIP/BWRITE/1.0/10.4.12.140:44818/MVMS_COMMS_WRITE1/1000
+#	kister_mpcount_reset		0	0
+#
+#/CIP_TCPIP/BWRITE/1.0/10.4.12.140:44818/MVMS_COMMS_WRITE2/1000
+#	kister_24count_reset		0	0
+#
+#/CIP_TCPIP/BREAD/1.0/10.4.12.140:44818/MVMS_COMMS_WRITE3/1000
+#	kister_mpcount_ack		0	0
+#
+#/CIP_TCPIP/BREAD/1.0/10.4.12.140:44818/MVMS_COMMS_WRITE4/1000
+#	kister_24count_ack		0	0
+
+###############################################################################
+# Unitech 2 PLC - Modicon Premium 
+###############################################################################
+/MB_TCPIP/BREAD/0/10.4.12.139:502/000000/1000
+	start_depall_order_ack		000217	0
+	comp_depall_order_ack		000218	0
+	start_scrap_order_ack		000219	0
+	comp_scrap_order_ack		000220	0
+	start_return_order_ack		000221	0
+	comp_return_order_ack		000222	0
+
+/MB_TCPIP/BWRITE/0/10.4.12.139:502/000000/1000
+	start_depall_order_req		000101	0
+	comp_depall_order_req		000102	0
+	start_scrap_order_req		000103	0
+	comp_scrap_order_req		000104	0
+	start_return_order_req		000105	0
+	comp_return_order_req		000106	0
+
+/MB_TCPIP/WWRITE/0/10.4.12.139:502/400000/1000
+        new_depall_write_pack_fmt	401003  16
+
+/MB_TCPIP/WREAD/0/10.4.12.139:502/400000/1000
+        new_depall_read_pack_fmt	401203  16
+
+###############################################################################
+# Section 3: PLC alarms
+###############################################################################
+
+###############################################################################
+# Newtec 1
+###############################################################################
+/MB_TCPIP/WREAD/0/10.4.12.131:502/400000/1000
+	new1_error_1				401101	16
+	new1_error_2				401102	16
+	new1_error_3				401103	16
+	new1_error_4				401104	16
+	new1_error_5				401105	16
+	new1_error_6				401106	16
+	new1_palletiser_status_1		401111	16
+
+###############################################################################
+# Newtec 2
+###############################################################################
+/MB_TCPIP/WREAD/0/10.4.12.132:502/400000/1000
+	new2_error_1				401101	16
+	new2_error_2				401102	16
+	new2_error_3				401103	16
+	new2_error_4				401104	16
+	new2_error_5				401105	16
+	new2_error_6				401106	16
+	new2_palletiser_status_2		401111	16
+
+###############################################################################
+# Newtec 3
+###############################################################################
+/MB_TCPIP/WREAD/0/10.4.12.133:502/400000/1000
+	new3_error_1				400531	16
+	new3_error_2				400532	16
+	new3_error_3				400533	16
+	new3_error_4				400534	16
+	new3_error_5				400535	16
+
+###############################################################################
+# Newtec 4
+###############################################################################
+/MB_TCPIP/WREAD/0/10.4.12.134:502/400000/1000
+	new4_error_1				400541	16
+	new4_error_2				400542	16
+	new4_error_3				400543	16
+	new4_error_4				400544	16
+	new4_error_5				400545	16
+	new4_error_6				400546	16
+	new4_error_7				400547	16
+	new4_error_8				400548	16
+	new4_error_9				400549	16
+	new4_error_10				400550	16
+	new4_error_11				400551	16
+	new4_error_12				400552	16
+	new4_error_13				400553	16
+	new4_error_14				400554	16
+	new4_error_15				400555	16
+	new4_error_16				400556	16
+	new4_error_17				400557	16
+	new4_error_18				400558	16
+
+/MB_TCPIP/WREAD/0/10.4.12.134:502/400000/1000
+	new4_transfer_car_500_status		401211	16
+	new4_transfer_car_501_status		401212	16
+	new4_conveyor_remove_pallet_status	401213	16
+	new4_transfer_car_310_status		401215	16
+	new4_buffer_l12_status			401216	16
+	new4_buffer_l34_status			401217	16
+	new4_buffer_l56_status			401218	16
+	new4_buffer_l78_status			401219	16
+
+###############################################################################
+# Newtec 5
+###############################################################################
+/MB_TCPIP/WREAD/0/10.4.12.135:502/400000/1000
+	new5_error_1				400531	16
+	new5_error_2				400532	16
+	new5_error_3				400533	16
+	new5_error_4				400534	16
+	new5_error_5				400535	16
+
+/MB_TCPIP/WREAD/0/10.4.12.135:502/400000/1000
+	new5_transfer_car_status		401211	16
+	new5_stacker_status			401212	16
+	new5_conveyor_status			401213	16
+
+###############################################################################
+# Newtec 6
+###############################################################################
+/MB_TCPIP/WREAD/0/10.4.12.136:502/400000/1000
+	new6_error_1				401101	16
+	new6_error_2				401102	16
+	new6_error_3				401103	16
+	new6_error_4				401104	16
+	new6_error_5				401105	16
+	new6_error_6				401106	16
+	new6_depalletiser_status_ab		401111	16
+
+###############################################################################
+# Newtec 7
+###############################################################################
+/MB_TCPIP/WREAD/0/10.4.12.137:502/400000/1000
+	new7_error_1				401101	16
+	new7_error_2				401102	16
+	new7_error_3				401103	16
+	new7_error_4				401104	16
+	new7_error_5				401105	16
+	new7_error_6				401106	16
+	new7_depalletiser_status_cd		401111	16
+
+###############################################################################
+# Unitech 1
+###############################################################################
+/MB_TCPIP/WREAD/0/10.4.12.138:502/400000/1000
+	uni1_error_1				401302	16
+	uni1_error_2				401303	16
+	uni1_error_3				401304	16
+	uni1_error_4				401305	16
+	uni1_error_5				401306	16
+	uni1_error_6				401307	16
+	uni1_error_7				401308	16
+	uni1_error_8				401309	16
+	uni1_error_9				401310	16
+	uni1_error_10				401311	16
+	uni1_error_11				401312	16
+	uni1_error_12				401313	16
+	uni1_error_13				401314	16
+	uni1_error_14				401315	16
+	uni1_error_15				401316	16
+	uni1_error_16				401317	16
+	uni1_error_17				401318	16
+	uni1_error_18				401319	16
+	uni1_error_19				401320	16
+	uni1_error_20				401321	16
+	uni1_error_21				401322	16
+	uni1_error_22				401323	16
+	uni1_error_23				401324	16
+
+###############################################################################
+# Unitech 2
+###############################################################################
+/MB_TCPIP/WREAD/0/10.4.12.139:502/400000/1000
+	uni2_error_1				401302	16
+	uni2_error_2				401303	16
+	uni2_error_3				401304	16
+	uni2_error_4				401305	16
+	uni2_error_5				401306	16
+	uni2_error_6				401307	16
+	uni2_error_7				401308	16
+	uni2_error_8				401309	16
+	uni2_error_9				401310	16
+	uni2_error_10				401311	16
+	uni2_error_11				401312	16
+	uni2_error_12				401313	16
+	uni2_error_13				401314	16
+	uni2_error_14				401315	16
+	uni2_error_15				401316	16
+	uni2_error_16				401317	16
+	uni2_error_17				401318	16
+	uni2_error_18				401319	16
+	uni2_error_19				401320	16
+	uni2_error_20				401321	16
+	uni2_error_21				401322	16
+	uni2_error_22				401323	16
+	uni2_error_23				401324	16
+	uni2_error_24				401325	16
+	uni2_error_25				401326	16
+	uni2_error_26				401327	16
+	uni2_error_27				401328	16
+	uni2_error_28				401329	16
+	uni2_error_29				401330	16
+	uni2_error_30				401331	16
+	uni2_error_31				401332	16
+	uni2_error_32				401333	16
+	uni2_error_33				401334	16
+	uni2_error_34				401335	16
+	uni2_error_35				401336	16
+	uni2_error_36				401337	16
+	uni2_error_37				401338	16
+	uni2_error_38				401339	16
+	uni2_error_39				401340	16
+	uni2_error_40				401341	16
+	uni2_error_41				401342	16
+	uni2_error_42				401343	16
+	uni2_error_43				401344	16
+	uni2_error_44				401345	16
+	uni2_error_45				401346	16
+	uni2_error_46				401347	16
+	uni2_error_47				401348	16
+

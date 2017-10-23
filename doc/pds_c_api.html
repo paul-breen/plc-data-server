@@ -1,0 +1,250 @@
+<HTML>
+<HEAD>
+<TITLE>PLC Data Server C API</TITLE>
+<LINK REL=STYLESHEET TYPE="text/css" HREF="pds.css">
+</HEAD>
+
+<BODY CLASS=mainText>
+<H1>PLC Data Server C API</H1>
+<H2>Library information</H2>
+<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=2 CELLSPACING=0 FRAME=RHS RULES=COLS>
+	<COL WIDTH=9*>
+	<COL WIDTH=79*>
+	<COL WIDTH=168*>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P>Name</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P>libpds</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Install directories</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">/home/lib /home/include</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Source Directories</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">$PDSDIST/lib/modules/pds/pds_api $PDSDIST/lib/modules/pds/pds_ipc</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Make Directory</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">$PDSDIST/lib/libs/libpds</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Library Dependencies</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">No dependencies</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Headers</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">pds.h</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Libraries</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">libpds.a libpds.so.1</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Written in</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">C</P>
+		</TD>
+	</TR>
+</TABLE>
+
+<H2>Outline</H2>
+<P>This library provides client programs with a C programming language Application Programming Interface (API) to the <A HREF="pds_glossary.html#pds">PLC Data Server</A> (PDS).  The API uses a <A HREF="pds_glossary.html#tag">tag abstraction</A>.</P>
+
+<H2>Methods</H2>
+<P>connect_to_server()<BR>
+This function allows a client program to connect to the PDS.<BR>
+A server connection key is passed to the function.  If the
+connection key is NULL or zero, then a <A HREF="pds_glossary.html#pds_ipckey">default</A> is used.
+The client program is connected to the server which is
+identified by the connection key.  The server connection
+structure is returned which is used in all subsequent
+calls to the server.  On error a null pointer is returned.
+
+<P>disconnect_from_server()<BR>
+This function allows a client program to disconnect from the PDS (unregister from the <A HREF="pds_glossary.html#pds_ipc_resources">PDS's IPC resources</A> and free memory for the connection structure).<BR>
+A valid server connection struct is passed to the function.
+The client program is disconnected from the server.  If an
+error occurrs a -1 is returned.
+
+<P>get_tag()<BR>
+This function allows a client program to get a tag's value.<BR>
+A valid server connection, the tagname and a string for
+storage of the tag's value are passed to the function.
+The tagname is accessed in the shared memory segment and
+its corresponding value is returned.  A flag is returned to
+indicate whether the tag was found or not.
+
+<P>get_tagf()<BR>
+This function allows a client program to get a tag's value (formatted).<BR>
+A valid server connection, the tagname, a string for
+storage of the tag's value and a <A HREF="pds_glossary.html#fmtspec">data format specifier</A>
+are passed to the function.
+The tagname is accessed in the shared memory segment and
+its corresponding value is returned formatted as the
+specified type.  A flag is returned to indicate whether the
+tag was found or not.
+
+<P>get_strtag()<BR>
+This function allows a client program to get a contiguous string of tags' values as a single value (formatted).<BR>
+A valid server connection, the tagname (base), the number
+of tagvalues to read, a string for storage of the tags'
+value and a <A HREF="pds_glossary.html#fmtspec">data format specifier</A> are passed to the
+function.
+The tagnames are accessed in the shared memory segment and
+their value's as a string are returned formatted as the
+specified type.  A flag is returned to indicate whether the
+tag was found or not.
+
+<P>set_tag()<BR>
+This function allows a client program to set a tag's value.<BR>
+A valid server connection, the base tagname, the no. of
+tags to write and the tag value(s) as an integer pointer
+are passed to the function.
+A message is sent to the PLC server requesting that the
+tag value(s) be written to the PLC.  A flag is returned to
+indicate whether the message was sent to the server or not.
+
+<P>set_strtag()<BR>
+This function allows a client program to set a contiguous string of tags' values as a single value.<BR>
+A valid server connection, the tagname (base) and the tags'
+value represented as a string are passed to the function.
+A message is sent to the PLC server requesting that the
+tagvalue be written to the PLC.  A flag is returned to
+indicate whether the message was sent to the server or not.
+
+<P>get_flag_state()<BR>
+This function allows a client program to get a <A HREF="pds_glossary.html#flag">flag's</A> state.<BR>
+A valid server connection and the tagname of the flag to
+get are passed to the function.
+The flag's value is returned.  On error a -1 is returned.
+
+<P>set_flag_state()<BR>
+This function allows a client program to set a <A HREF="pds_glossary.html#flag">flag's</A> state.<BR>
+A valid server connection, the tagname of the flag to set
+and the value to set are passed to the function.
+A flag is returned indicating if the flag was set.
+
+<P>get_taglist()<BR>
+This function allows a client program to get a <A HREF="pds_glossary.html#taglist">taglist's</A> values.<BR>
+A valid server connection and a PLC taglist structure
+containing an array of tag structs to get data for are
+passed to the function.
+The tags' data are read into the value strings of the
+tag structs.  A count is returned of number of tags read
+from the PLC.  On error a -1 is returned.
+
+<P>get_wordbit_state()<BR>
+This function allows a client program to get a <A HREF="pds_glossary.html#wordbit">wordbit's</A> value.<BR>
+A valid server connection, the tagname and the bit number
+within the word (1-16) to get are passed to the function.
+The bit's value is returned.  On error a -1 is returned.
+
+<P>set_wordbit_state()<BR>
+This function allows a client program to set a <A HREF="pds_glossary.html#wordbit">wordbit's</A> value.<BR>
+A valid server connection, the tagname, the tagvalue, the
+bit number within the word (1-16) to set and the bit value
+to set the bit to are passed to the function.
+A flag is returned indicating if the tag was set.  The tag
+value is modified with the bit value.
+
+<P>get_tag_status()<BR>
+This function allows a client program to get a tag's PLC status.<BR>
+A valid server connection, the tagname and a pointer to the
+tag's status are passed to the function.
+The tagname is accessed in the shared memory segment and
+its corresponding status is set.  On error a -1 is returned.
+
+<P>check_proto_ver()<BR>
+This macro function allows a client program to get the <A HREF="pds_glossary.html#febe_proto_ver">front-end/back-end (febe) protocol version</A> that the PDS is using.  If a client connects with a different febe protocol version than that of the PDS, the connection fails.<BR>
+A valid server connection is passed to the function.
+The febe protocol version is returned.
+
+<P>check_plc_status()<BR>
+This macro function allows a client program to check whether the status of the PLC was good after calling an API function.<BR>
+A valid server connection is passed to the function.
+The status word of the PLC on which the tag passed in the API call resides is returned.  A zero signifies success (no status exists for this tag on this PLC), a positive integer signifies a <A HREF="pds_glossary.html#plcstatus">status condition</A> exists for this tag on this PLC.
+
+<P>print_plc_status()<BR>
+This macro function allows a client program to print a string detailing the status of the PLC after calling an API function.<BR>
+A valid server connection is passed to the function.
+The string detailing a <A HREF="pds_glossary.html#plcstatus">PLC's status</A> is returned.
+
+<P>
+<CENTER>
+<TABLE HEIGHT="60" BORDER="3" BGCOLOR="#C0C0C0"><TR>
+<TD ALIGN="CENTER" COLSTART="1" HEIGHT="40" WIDTH="140"><A HREF="index.html">Back to PLC Data Server Overview</A></TD>
+<TD ALIGN="CENTER" COLSTART="2" HEIGHT="40" WIDTH="140">&nbsp</TD>
+<TD ALIGN="CENTER" COLSTART="3" HEIGHT="40" WIDTH="140">&nbsp</TD>
+<TD ALIGN="CENTER" COLSTART="4" HEIGHT="40" WIDTH="140">&nbsp</TD>
+<TD ALIGN="CENTER" COLSTART="5" HEIGHT="40" WIDTH="140">&nbsp</TD>
+</TR> 
+</TABLE>
+</CENTER>
+
+<H6>Last updated on 2000-05-06<BR>
+Paul M. Breen</H6><BR>
+</BODY>
+</HTML>
+

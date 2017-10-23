@@ -1,0 +1,37 @@
+The PDS network stub provides a TCP/IP server interface to the PDS.
+
+The network stub connects via the PDS API to a local PDS as a client.  It then
+presents a network server interface via a listening socket on its well-known
+port (9574), and accepts network client connections via the PDS Network
+Protocol (PDSNP) API.  In this way, it network-enables the PDS by acting as a
+proxy server.  By default, it will run as a daemon process, with no
+controlling terminal.
+
+As a secure default, the network stub listens on localhost.  However, if a
+client is local, then the network stub is pretty much redundant, so normally
+the network stub should be invoked with the hostname or IP address of the
+host.  To instruct the network stub to listen on all network interfaces
+(including localhost), then an IP address of 0.0.0.0 should be specified.
+
+Examples
+--------
+
+Run the network stub with defaults.  This listens on localhost:9574 and runs as a daemon process in the background:
+
+./pds_nwstubd
+
+Run the network stub with defaults, but in debug mode.  This stops the network
+stub from daemonising, and prints debug messages to the calling terminal:
+
+./pds_nwstubd -d
+
+Instruct the network stub to listen on a given host and port, and with an
+increased debug level:
+
+./pds_nwstubd -h 192.168.0.1 -p 9999 -d 2
+
+Instruct the network stub to listen on all network interfaces, on its standard
+port, and to run in the background as a daemon:
+
+./pds_nwstubd -h 0.0.0.0
+

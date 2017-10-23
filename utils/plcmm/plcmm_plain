@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Purpose: A shell script to act as a wrapper to the PLC Memory Mapper.  The
+#          script outputs plain text as a CGI script.
+# Author:  Paul M. Breen
+# Date:    2002-05-02
+# Usage:   plcmm_plain
+
+# N.B.: This script should be copied along with the PLC memory mapper (plcmm)
+#       to your web server's cgi-bin directory (or wherever you run cgi scripts
+#       from).  It should be owned by the unpriveledged web user - e.g.,
+#       nobody:nogroup
+
+# Print HTTP headers to tell the browser the content type
+echo "Content-type: text/plain"
+echo ""
+
+# Run the PLC Memory Mapper in normal mode
+./plcmm
+
+exit 0

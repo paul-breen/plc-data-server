@@ -1,0 +1,208 @@
+### 2.1.0 ###
+- Modified configure.in to include variables for enabling the PDS network
+  stub.  Based on these variables, the PDS control script will start/stop
+  the network stub as well as the PDS.
+### 2.0.0 ###
+- Rolled the new PDS Network Protocol (PDSNP) APIs, the PDSNP network stub,
+  and the PDSNP utility client nwtio from the experimental src tree into the
+  main src tree after successful testing.  These new APIs will not affect
+  existing clients so FE/BE protocol version has not been incremented.  The
+  network stub connects via the PDS API to a local PDS as a client.  It then
+  presents a network server interface via a listening socket on its well-known
+  port (9574), and accepts network client connections via the PDSNP API.  In
+  this way, it network-enables the PDS by acting as a proxy server.  The nwtio
+  network client program is analogous to tio for the PDS API.
+### 1.3.3 ###
+- New utility program force_tag_status.  This allows a tag's status to be
+  forced to a user-specified value or a user-specified bit to be set or
+  cleared.  This is of most use to set a PLC tag's status to a non-PDS status
+  value (e.g., the high (16th) bit) which has the effect of putting comms to
+  that PLC offline at runtime (rather than stopping the PDS & commenting-out
+  the PLC's comms in the config. file!).
+- Minor mods. to plcmm.  It now dynamically calcs. the longest tagname of
+  all configured tags & sets the tagname field width accordingly.
+- Developed a plc.cnf for the regression test program that uses CIP tags.
+- Minor mods. to some of the utility programs (increased field size of tagname
+  in plcmm & addrmm, tem now uses new API - PDSget_tag_object() to get a
+  pointer to its tag).  Also removed crd from the utility programs that are
+  built.  Basically all crd's functionality (& more) is available with
+  mcrd.
+- Modified the configuration structure (& therefore a lot of the PDS code).
+  Rather than just a Unit ID to identify a PLC in the rack, you can now
+  specify a full routing path (integers separated by a '.').  This was to
+  accommodate the CIP driver.
+- The CIP driver (unlike the other drivers) doesn't like to connect/disconnect
+  for each query (it falls over after roughly every 150 connections).  The
+  solution is to connect (TCP/IP) once, register with CIP once & then fire off
+  multiple queries on the connection (which is private to the driver).  The
+  driver also (attempts) to determine a comms failure & subsequently reconnect
+  as necessary.
+- New PDS API - PDSget_tag_object().  This function returns a pointer to a
+  tag object identified by its tagname.  This is primarily used to get metadata
+  about the tag & was developed to support the CIP need to know type info.
+- Added type information (via new function codes for read/writing bits, bytes,
+  16 bit ints, 32 bit ints, 32 bit floats, 64 bit floats & a new ascii base
+  address convention for specifying array types (append [] to ascii address).
+  These changes were made to support the CIP driver because you have to know
+  a register's type information for writing to it.
+- New code branch to incorporate the new EtherNet/IP (ControlNet - CIP) driver
+  into the PDS.
+### 1.3.2 ###
+- Added a status option to the PDS control script (pds) which reports if the
+  PDS is running or not (ala the LSB).
+- Replaced various bits of code in the server where it had to check the comms
+  protocol before reporting errors so as to address the PLC correctly (either
+  IP address:port:unit or tty_dev:unit).  The code now calls the
+  PDS_GET_PLC_FQID() macro which stores the PLC's fully-qualified ID in a
+  user supplied string.  There is also a PDS_GET_TAG_FQID() macro for getting
+  a tag's fully-qualified ID (PLC_FQID tagname).
+- A number of small (largely cosmetic) mods. to various PDS utility programs
+  to give an overall uniform look/feel.
+- New code branch to address the fact that running a status query before each
+  data query shouldn't be implicit.  In 1.3.1 (& earlier) every data query was
+  preceeded by a status query (to check the run status of the PLC), this was
+  implicit in the code & the user had no choice over it.  However, the
+  Schneider Premiums (communicated to via the MB driver) do not support Hex
+  Function Code 0x11 (Report Slave ID) which the MB driver used to ascertain
+  the run status of the PLC (984s, Quantums).  It was thus decided to have a
+  command line switch (-s) for the user to decide whether to run a status query
+  or not.  This switch is incorporated into the PDS's bit-encoded runtime
+  parameters variable (runmode).  Also disabling the running of status queries
+  (by not passing -s on the command line) results in a performance increase
+  because now the PDS only does 1 query (data) instead of 2 (status & data).
+### 1.3.1 ###
+- Finally got round to making plcmm run in a "CGI mode" to output HTML
+  tables.  This can be used as a CGI script in a shell script wrapper, as a
+  SSI exec call in an HTML page etc.
+- Rolled the new PDS APIs (accessor macros for the pdsconn & pdstag structs as
+  well as some new functions for cycling through the PDS's shared memory data
+  & status tags from client programs) from the experimental src tree into the
+  main src tree after successful testing.  These new APIs will not affect
+  existing clients so FE/BE protocol version has not been incremented.  A new
+  version of the PLC memory-mapper utility program has been written to take
+  advantage of these new APIs.  It is functionally equivalent to the old one.
+- Modified configure to build the PDS control script (pds) at configure time.
+  The path to the PDS & its data directory is created from the user's configure
+  time 'prefix' rather than hard-coded in the script.
+- PDS now logs a timestamp of when it is put offline as well as logging a
+  timestamp of when it is put back online.  It also logs the PDS version &
+  build time in its startup messages.
+- New utility programs to list/control the PDS SPI.  spimm will show a
+  memory-map of the SPI, pds_ctl allows getting/setting an SPI variable.
+  These programs are analogous to plcmm & tio for the PDS API.
+- New (minor) version because the PDS SPI (Server Programming Interface) has
+  been added.  These mods. won't break any existing clients as such BUT
+  because the server has been modified (to use the SPI) the FE/BE protocol has
+  been incremented so clients will need to be rebuilt.
+### 1.3 ###
+- Added PLC comms protocol to configuration file scanner.
+- Configuration file scanner source is now part of the server instead of in
+  a separate lib.
+- ModBus specific code is now situated in a sub-dir of the server called
+  drivers (was in a separate lib).  This sub-dir now also contains a
+  DataHighway driver module.
+- Configuration file now accepts integer or logical ascii addresses.
+  Generally ModBus uses integer & DataHighway uses ascii.
+- Server source now contains a new structure - pdstrans.  This is a struct to
+  encapsulate a complete PLC transaction (query & response).  This struct is
+  now passed around the server's functions instead of the separate parameters.
+- Changed all the #def's, functions, structs etc. in the PLC config scanner
+  so that it is no longer ModBus specific.  It is now a generic PLC config
+  scanner (ModBus, DataHighway at present).
+- New server header - pds_utils.h - for utility defines etc.
+- Changed the name of the PLC config file.  It was mb.cnf, now plc.cnf.
+- Changed the function names in the PLC config file.  Rather than ModBus
+  specific (CS_READ, HR_READ etc.) they are now generic (BREAD, WREAD etc.).
+- Each driver now has a routine to map between the generic PDS functions & the
+  equivelent function for the driver's particular protocol.
+- Block lines in the PLC config file can now begin with a forward slash (/)
+  as well as the previous method of a caret (^).
+- New header files to define the functions & protocols handled by the PDS,
+  pds_functions.h & pds_protocols.h.
+- PLC config scanner now has 2 lookup tables, 1 for functions & 1 for protocols
+  making it easier to add new ones.  Lookup structs defined in utils header.
+- Completely overhauled the PDS's queries struct.  Now easier to manage.
+- Removed the serial ASCII control char #def's from the DH driver & put them in
+  the PLC comms module header as they are generic.
+- Added some permanent hex. debug output of the query & response byte arrays in
+  the drivers.
+- DH driver now quits plc query function with an error if it is unsuccessful in
+  reading a query ACK or the response (so it doesn't try indefinitely).
+- More #def's in the MB header instead of hard-coded values in the driver.
+- Began adding pure serial comms support to the PDS.  The plc comms module has
+  a new function 'open_plc_tty()' to open a serial port for comms.  Began
+  adding serial read/write functions to the MB driver.
+- Re-designed the query/response building/parsing.  The transaction structure
+  now contains a new buffer (buf) which is used to build up the specific query
+  that is to be run & the PLC's response is also read into this buffer.  What
+  that means is that the query contains purely the protocol (MB or DH) & the
+  buffer contains the query with its transport-dependent prefix/postfix etc.
+  Similarly, on return from comms with the PLC the buffer contains the response
+  with its TD prefix/postfix & the response contains only the pure protocol
+  reply.  This makes it easier to use the same code to build (say) a MB query
+  INDEPENDENT of the comms sub-protocol.
+- Made some general mods. to the debug library module, specifically to allow
+  multiple levels of debugging rather than the abortive method previously used
+  of trying to turn debugging on/off at runtime using signals!
+- Mod. the PDS control script (pds) to allow passing of an optional debug
+  level to control debug output (see above).
+- Minor mod. to pds_io.c.  If an optional debug level (see above) of 4 is
+  passed, then the PDS has a short pause after running each read query.
+- Mod. PLC config scanner.  Now reads a double quoted TTY device path
+  (e.g., "/dev/ttyS1") in place of an IP addr:port if PLC is attached to a
+  serial port.
+- Made some general, minor mods. to pdsconn, pdstag & pdsquery.
+- In PLC comms module, mod. the function to open a tty port, added functions
+  to close, read & write tty ports.
+- In main I/O module, implemented a generic connect/disconnect interface to a
+  PLC so as to talk to a serial or network PLC.
+- Added serial code to the DH driver.
+- Added serial code to the MB driver.
+- Overhauled the makefile hierarchy.  The "user.group" is now passed from the
+  top-level makefile to the sub-makefiles.  The sub-makefiles also have
+  default build directory/owners in case of not running top-level make.
+- Tested the new value member of the tag struct.  Ok.  Incremented the FE/BE
+  protocol version as this is not backwards compatible.
+- Overhauled the source directory structure (specifically, the APIs' headers
+  are under 'include' & the APIs' source are split into different directories
+  under 'interfaces').
+- Restructured the 'C' API & the PDS's headers.  The headers needed by the
+  PDS are more independent of those needed by client programs (via the API).
+- Overhauled the 'C' API.  ALL public functions now begin with 'PDS'.  Also
+  modified some functions so that the return value is consistent across all
+  functions in the API (0 == success, -1 == error).  The connect routine now
+  always returns a 'pdsconn' struct (unless, of course, it couldn't be
+  malloc()'d) & the client has to interrogate the connection's status (using
+  the macro 'PDScheck_conn_status(conn)') to determine if the connection was
+  successful or not.
+- Modified the Tcl/Tk interface as this is based on the 'C' API.  These mods.
+  were internal.
+- Overhauled the whole build process.  In keeping with other source packages
+  the build process is now: ./configure; make; make install
+- Now builds the Tcl/Tk interface only if specified at configure time.  Also
+  builds the utilities that use the curses library only if a curses library
+  was found at configure time.
+- Moved all the 'auxillary' autoconf files (config.guess, acconfig.h etc.)
+  into a sub-directory (auto-configure) of the toplevel source directory.
+  This cuts down on the clutter in the toplevel directory.
+- Changed the internal storage for PLC data (tagvalues).  They WERE encoded as
+  an ASCII string representation of the data but are NOW stored as an unsigned
+  16-bit word (unsigned short int).  This is much less wasteful on memory and
+  should allow for faster updating/retrieval.
+- Before making the above modifications to the internal storage a new test
+  utility was developed to test the impact of such changes:
+  'regression_test.c'.  This is quite basic & is only for use during
+  development but could be further developed.
+- Incremented the FE/BE protocol version as the above modifications to the
+  internal storage are not backwards compatible.
+- Implemented a global index that points to the 1st tag of a specified block.
+  A new data member of the 'pdstrans' struct - 'block_start' is then set using
+  this index (via an accessor macro) before refreshing the block's data tags.
+  This avoids the need for a sequential scan of the shared memory to find the
+  start of the block.
+- Modified/added command line options.  The command line option to specify the
+  PDS's data directory is now '-D', which is more obvious (it was '-i').  Also
+  a new option '-r {all|block}' sets the PDS's refresh mode.  If set to 'all',
+  then the PDS locks the shared memory for the duration of refreshing the whole
+  shared memory segment.  If set to 'block', then the PDS locks the shared
+  memory segment on a block-by-block basis.

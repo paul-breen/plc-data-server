@@ -1,0 +1,185 @@
+#******************************************************************************
+# PROJECT:  PLC Data Server
+# MODULE:   Makefile.defs
+# PURPOSE:  Global definitions makefile for the PDS
+#           N.B.: Before including this file, you must set the SRCDIR variable
+#                 to the path of the top of the PDS source tree (the directory
+#                 that contains this file)
+# AUTHOR:   Paul M. Breen
+# DATE:     2000-05-24
+#******************************************************************************
+
+#******************************************************************************
+# CONFIGURATION
+#
+# Settings pertaining to the PDS build and installation of the port
+#******************************************************************************
+
+# The current version information for the PDS
+PDS_VERSION= @PDS_VERSION@
+
+# For convenience, PDS_DIR is where PDS_BIN_DIR, and PDS_LIB_DIR and
+# other target destinations are rooted.  Of course, each of these is
+# changable separately
+PDS_DIR= @prefix@
+
+# Where the PDS executables get installed (changeable by just putting them
+# somewhere else and putting that directory in your shell PATH)
+PDS_BIN_DIR= $(PDS_DIR)/bin
+
+# Where libpds.a etc. get installed.  You must put them where your loader
+# will look if you wish to use the -lpds convention.  Otherwise you can just
+# put the absolute pathname to the library at the end of your command line
+PDS_LIB_DIR= $(PDS_DIR)/lib
+
+# Where the header files necessary to build frontend programs get installed
+PDS_INC_DIR= $(PDS_DIR)/include
+
+# Where the PLC configuration file gets installed
+PDS_DATA_DIR= $(PDS_DIR)/data
+
+# Where the man pages (suitable for use with "man") get installed
+PDS_MAN_DIR= $(PDS_DIR)/man
+
+# Where the formatted documents (e.g., html) get installed
+PDS_DOC_DIR= $(PDS_DIR)/doc
+
+# Path to the 'C' interface library src directory
+PDS_BUILD_LIBPDS_DIR= $(SRCDIR)/interfaces/libpds
+
+# Path to the 'C' SPI interface library src directory
+PDS_BUILD_LIBPDS_SPI_DIR= $(SRCDIR)/interfaces/libpds_spi
+
+# Path to the 'C' network protocol interface library src directory
+PDS_BUILD_LIBPDSNP_DIR= $(SRCDIR)/interfaces/libpdsnp
+
+# Path to the 'C' interface static library
+PDS_BUILD_LIBPDS_A= $(PDS_BUILD_LIBPDS_DIR)/libpds.a
+
+# Path to the 'C' interface dynamic library
+PDS_BUILD_LIBPDS_SO= $(PDS_BUILD_LIBPDS_DIR)/libpds.so
+
+# Path to the 'C' SPI interface static library
+PDS_BUILD_LIBPDS_SPI_A= $(PDS_BUILD_LIBPDS_SPI_DIR)/libpds_spi.a
+
+# Path to the 'C' SPI interface dynamic library
+PDS_BUILD_LIBPDS_SPI_SO= $(PDS_BUILD_LIBPDS_SPI_DIR)/libpds_spi.so
+
+# Path to the 'C' network protocol interface static library
+PDS_BUILD_LIBPDSNP_A= $(PDS_BUILD_LIBPDSNP_DIR)/libpdsnp.a
+
+# Path to the 'C' network protocol interface dynamic library
+PDS_BUILD_LIBPDSNP_SO= $(PDS_BUILD_LIBPDSNP_DIR)/libpdsnp.so
+
+# Path to the include src directory
+PDS_BUILD_INC_DIR= $(SRCDIR)/include
+
+# Path to the support library src directory
+PDS_BUILD_LIBSUPPORT_DIR= $(SRCDIR)/libsupport
+
+# Path to the static support library
+PDS_BUILD_LIBSUPPORT_A= $(PDS_BUILD_LIBSUPPORT_DIR)/libsupport.a
+
+# Path to the dynamic support library
+PDS_BUILD_LIBSUPPORT_SO= $(PDS_BUILD_LIBSUPPORT_DIR)/libsupport.so
+
+# Any include & library paths passed at configure time
+PDS_CONF_INC_DIRS= @PDS_CONF_INC_DIRS@
+PDS_CONF_LIB_DIRS= @PDS_CONF_LIB_DIRS@
+
+#******************************************************************************
+# FEATURES
+#
+# To disable a feature, comment out the entire definition (that is, prepend
+# '#', don't set it to "0" or "no")
+#******************************************************************************
+
+# Please do not edit any of the USE_* macros by hand
+USE_TCL= @USE_TCL@
+USE_CURSES= @USE_CURSES@
+
+#******************************************************************************
+# INSTALLATION
+#******************************************************************************
+
+# For many ports, INSTALL is overridden below
+INSTALL= @INSTALL@
+
+INSTL_OPTS= @INSTL_OPTS@
+INSTL_EXE_OPTS= @INSTL_EXE_OPTS@
+INSTL_LIB_OPTS= @INSTL_LIB_OPTS@
+INSTL_SHLIB_OPTS= @INSTL_SHLIB_OPTS@
+
+#******************************************************************************
+# FOR BUILDING SHELL SCRIPTS & MAKEFILES
+#
+# For many ports, these are overridden below
+#******************************************************************************
+
+# Ignore BSD_SHLIB if you're not using one of the BSD ports.  But if you are,
+# and it's one that doesn't have shared libraries (NetBSD/vax is an example of
+# this), set BSD_SHLIB to null in Makefile.custom
+BSD_SHLIB= true
+
+# This is mainly for use on FreeBSD, where we have both a.out and elf systems
+# now.  May be applicable to other systems to?
+ELF_SYSTEM= @ELF_SYS@
+
+# ECHO_N is what we put before the text on an echo command when we don't want
+# a trailing newline.  ECHO_C is what we put at the end of the string on an
+# echo command when we don't want a trailing newline.  On some systems, you
+# do echo -n "no newline after this", while on others you do echo "no newline
+# after this\c"
+ECHO_N= @ECHO_N@
+ECHO_C= @ECHO_C@
+
+# This is the versions of these programs on the local box
+CC= @CC@
+LEX= @LEX@
+LEXLIB= @LEXLIB@
+LN_S= @LN_S@
+AR= @AR@
+STRIP= @STRIP@
+IPCS= @IPCS@
+IPCRM= @IPCRM@
+TAR= @TAR@
+GZCAT= @GZCAT@
+TCLSH= @TCLSH@
+
+# Compiler/linker flags etc.
+CFLAGS= @CFLAGS@
+INCS= -I$(PDS_BUILD_INC_DIR) $(PDS_CONF_INC_DIRS)
+CFLAGS_SL= @SHARED_LIB@
+LDFLAGS= @LDFLAGS@
+LIBS= @LIBS@ -L$(PDS_BUILD_LIBPDS_DIR) $(PDS_CONF_LIB_DIRS)
+DLSUFFIX= @DLSUFFIX@
+
+#******************************************************************************
+# ADDITIONAL PLATFORM-SPECIFIC SETTINGS
+#******************************************************************************
+
+# Name of the target platform
+PORTNAME= @PORTNAME@
+CPU= @CPU@
+
+# Various grungy items needed to configure some platforms
+HAVE_POSIX_SIGNALS= @HAVE_POSIX_SIGNALS@
+
+#******************************************************************************
+# CUSTOMISATION
+#
+# This includes your local customisations if Makefile.custom exists in the
+# source directory.  This file doesn't exist in the original distribution so
+# that it doesn't get overwritten when you upgrade
+#******************************************************************************
+
+# If Makefile.custom exists then include it
+ifneq ($(wildcard $(SRCDIR)/Makefile.custom), )
+  include $(SRCDIR)/Makefile.custom
+endif
+
+# This goes here so that customisation in Makefile.custom is effective
+ifneq ($(CUSTOM_INSTALL),)
+  INSTALL= $(CUSTOM_INSTALL)
+endif
+

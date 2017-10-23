@@ -1,0 +1,41 @@
+<!-- PHP script to print contents of the PDS PLC configuration file as HTML -->
+<HTML>
+<HEAD>
+<TITLE>Example PLC Configuration</TITLE>
+<LINK REL=STYLESHEET TYPE="text/css" HREF="pds.css">
+</HEAD>
+
+<BODY CLASS=mainText>
+<H2>PLC Configuration File</H2>
+<P>
+<PRE>
+
+<?
+  error_reporting(7);
+
+  $filename = "../data/plc.cnf";
+
+  if(!readfile($filename))
+  {
+    print("<H1>Error opening PLC configuration file <EM>$filename</EM> for reading!!</H1>");
+  }
+?>
+
+</PRE>
+
+<P>
+<CENTER>
+<TABLE HEIGHT="60" BORDER="3" BGCOLOR="#C0C0C0"><TR>
+<TD ALIGN="CENTER" COLSTART="1" HEIGHT="40" WIDTH="140"><A HREF="index.html">Back to PLC Data Server Overview</A></TD>
+<TD ALIGN="CENTER" COLSTART="2" HEIGHT="40" WIDTH="140">&nbsp</TD>
+<TD ALIGN="CENTER" COLSTART="3" HEIGHT="40" WIDTH="140">&nbsp</TD>
+<TD ALIGN="CENTER" COLSTART="4" HEIGHT="40" WIDTH="140">&nbsp</TD>
+<TD ALIGN="CENTER" COLSTART="5" HEIGHT="40" WIDTH="140">&nbsp</TD>
+</TR> 
+</TABLE>
+</CENTER>
+
+<H6>Last updated on 2000-06-06<BR>
+Paul M. Breen</H6><BR>
+</BODY>
+</HTML>

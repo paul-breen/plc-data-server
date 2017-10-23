@@ -1,0 +1,26 @@
+To use plcmm as a CGI binary in a web application we have provided a (simple)
+CGI wrapper script (plcmm_cgi) around plcmm.
+
+This script should be copied along with the PLC memory mapper (plcmm)
+to your web server's cgi-bin directory (or wherever you run cgi scripts
+from).  It should be owned by the unpriveledged web user - e.g.,
+nobody:nogroup
+
+The shell script is very simple and just passes the CGI mode flag to plcmm
+to tell it to output HTML tables:
+
+  # Run the PLC Memory Mapper in CGI mode
+  ./plcmm -c
+
+However, plcmm is capable of more control over its output than just this
+(type plcmm -h for usage) & it may be that you need to edit the wrapper
+script to get full control over plcmm's output.
+
+We have also provided a slightly more complicated example of a wrapper for
+plcmm that "pushes" refreshed content from your web server to a browser
+giving updated values every 5 (default) seconds.  Read the script
+(plcmm_cgi_server_push) to understand how this is done.  The script is well
+commented.
+
+There is another script (plcmm_plain) that also runs as a CGI script but only
+outputs plain text instead of HTML.

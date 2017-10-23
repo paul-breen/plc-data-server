@@ -1,0 +1,12 @@
+Build instructions for the PLC Data Server (PDS)
+
+In this directory run './configure' with the necessary command line options
+(type './configure --help' for a list of options).
+
+Then type 'make'.  This will build the libraries, the PDS, utilities etc.
+
+Lastly type 'make install' to install the software to the configured location.
+
+An example PLC configuration file has been provided to base your own
+configuration on.  This is located in the data directory under the configured
+install directory.

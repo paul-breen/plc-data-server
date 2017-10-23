@@ -1,0 +1,104 @@
+<HTML>
+<HEAD>
+<TITLE>PLC Data Server Glossary of Terms</TITLE>
+<LINK REL=STYLESHEET TYPE="text/css" HREF="pds.css">
+</HEAD>
+
+<BODY CLASS=mainText>
+<H1>PLC Data Server Glossary of terms</H1>
+
+<P><HR>
+<H3><A NAME="pds">PLC Data Server (PDS)</A></H3>
+The PDS acts as a piece of middleware, simplifying a client's access to a PLC.
+It takes care of the TCP/IP network communications to a network enabled PLC and abstracts the ModBus protocol via a <A HREF="#tag">tag abstraction</A>.
+
+<H3><A NAME="pds_ipckey">Default PDS IPC Key</A></H3>
+The default PDS IPC key (passed to the connect routine) is 1423779 (hex 0x0015b9a3).
+
+<H3><A NAME="pds_ipc_resources">PDS IPC Resources</A></H3>
+The PDS uses UNIX IPC resources.
+It uses a shared memory segment to store the data read from a PLC in tag structures.
+Access to the shared memory is protected by a semaphore.
+Client requests to write data to the PLC are communicated to the PDS via a message sent on a message queue.
+
+<H3><A NAME="tag">Tags</A></H3>
+The API uses a tag abstraction - that is, a reference in the PLC is mapped to a tagname (a string) and the data value at the address in the PLC is mapped to a tagvalue (a string).<P>
+
+<H3><A NAME="flag">Flags</A></H3>
+A flag is a tag having only a boolean value {1|0}.<P>
+
+<H3><A NAME="wordbit">Wordbits</A></H3>
+A wordbit is a discrete bit (1-16) within a data word.<P>
+
+<H3><A NAME="taglist">Taglists</A></H3>
+A taglist is an array of <A HREF="#plctag">plctag structures</A>.
+<PRE>
+/******************************************************************************
+* Generic tag list structure definition                                       *
+******************************************************************************/
+typedef struct plctaglist_rec
+{
+  int ntags;                      /* The number of tags in the taglist */
+  plctag *tags;                   /* A pointer to the plctag array (taglist) */
+} plctaglist;                                                                   
+</PRE>
+<P>
+
+<H3><A NAME="plctag">plctag Structure</A></H3>
+<PRE>
+/******************************************************************************
+* Generic tag structure definition                                            *
+******************************************************************************/
+typedef struct plctag_rec
+{
+  char name[PDS_TAGNAME_LEN];     /* The tag's name */
+  char value[PDS_TAGVALUE_LEN];   /* String representation of tag's value */
+  char type;                      /* The tag's data type */
+} plctag;                                                                       
+</PRE>
+<P>
+
+<H3><A NAME="fmtspec">Format Specifiers</A></H3>
+<UL>
+Valid format specifiers are:
+<LI>Integers: 'i', 'd'</LI>
+<LI>Floating Point Numbers: 'f'</LI>
+<LI>Character Strings: 'c', 's'</LI>
+</UL>
+
+<H3><A NAME="febe_proto_ver">febe Protocol Version</A></H3>
+The front-end/back-end (febe) protocol version is a way of ensuring that a client and the PDS are 'talking' the same language.
+Every time a change is made to any of the structures in the PDS API, the febe protocol version is incremented.
+This means that if the PDS has been linked to one library, and a client has linked to another library, then upon the client attempting to connect to the PDS the connection will fail.
+This attempts to prevent library incompatabilities from causing a client to crash.<P>
+
+<H3><A NAME="plcstatus">PLC Status Values</A></H3>
+<UL>
+Valid PLC status values are:
+<LI>0 - PLC Status OK</LI>
+<LI>PDS_PLC_CONNERR - PLC Connection Error</LI>
+<LI>PDS_PLC_COMMSERR - PLC Comms Error</LI>
+<LI>PDS_PLC_RESPERR - PLC Response Error</LI>
+<LI>PDS_PLC_OFFLINE - PLC is Offline</LI>
+</UL>
+These values can be bitwise or'ed.
+
+<P><HR>
+
+<P>
+<CENTER>
+<TABLE HEIGHT="60" BORDER="3" BGCOLOR="#C0C0C0"><TR>
+<TD ALIGN="CENTER" COLSTART="1" HEIGHT="40" WIDTH="140"><A HREF="index.html">Back to PLC Data Server Overview</A></TD>
+<TD ALIGN="CENTER" COLSTART="2" HEIGHT="40" WIDTH="140">&nbsp</TD>
+<TD ALIGN="CENTER" COLSTART="3" HEIGHT="40" WIDTH="140">&nbsp</TD>
+<TD ALIGN="CENTER" COLSTART="4" HEIGHT="40" WIDTH="140">&nbsp</TD>
+<TD ALIGN="CENTER" COLSTART="5" HEIGHT="40" WIDTH="140">&nbsp</TD>
+</TR> 
+</TABLE>
+</CENTER>
+
+<H6>Last updated on 2000-05-06<BR>
+Paul M. Breen</H6><BR>
+</BODY>
+</HTML>
+

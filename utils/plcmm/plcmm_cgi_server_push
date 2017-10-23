@@ -1,0 +1,42 @@
+#!/bin/sh
+
+# Purpose: A shell script to act as a wrapper to the PLC Memory Mapper.  The
+#          command line option runs it in CGI mode.
+# Author:  Paul M. Breen
+# Date:    2002-05-02
+# Usage:   plcmm_cgi_server_push
+
+# N.B.: This script should be copied along with the PLC memory mapper (plcmm)
+#       to your web server's cgi-bin directory (or wherever you run cgi scripts
+#       from).  It should be owned by the unpriveledged web user - e.g.,
+#       nobody:nogroup
+
+# Set up some defaults
+DEF_REFRESH=5
+DEF_BOUNDARY="PDSboundaryPDS"
+
+# Print HTTP header to indicate to the browser that this URL's content comes
+# in multiple parts separated by a boundary.  Print the 1st boundary
+echo -ne "Content-type: multipart/x-mixed-replace; boundary=$DEF_BOUNDARY\n\n"
+echo -ne "--$DEF_BOUNDARY\n";
+
+# Loop continuously, pushing content to the browser
+while [ 1 ]
+do
+  # Print HTTP headers to tell the browser NOT to cache this content (it would
+  # eventually exhaust the browser's cache)
+  echo "Expires: 0"
+  echo "Pragma: no-cache"                             # HTTP/1.0
+  echo "Cache-Control: no-cache, must-revalidate"     # HTTP/1.1
+  echo "Content-type: text/html"
+  echo ""
+
+  # Run the PLC Memory Mapper in CGI mode
+  ./plcmm -c
+
+  # Print the boundary between this refresh & the next then sleep
+  echo -ne "\n\n--$DEF_BOUNDARY\n";
+  sleep $DEF_REFRESH
+done
+
+exit 0

@@ -1,0 +1,17 @@
+#******************************************************************************
+# PROJECT:  PLC Data Server
+# MODULE:   Makefile.tcldefs
+# PURPOSE:  Global Tcl definitions makefile for the PDS
+#           N.B.: Before including this file, you must set the SRCDIR variable
+#                 to the path of the top of the PDS source tree (the directory
+#                 that contains this file)
+# AUTHOR:   Paul M. Breen
+# DATE:     2000-05-24
+#******************************************************************************
+
+#******************************************************************************
+# TCL CONFIGURATION DEFINITIONS
+#******************************************************************************
+
+@TCL_CONFIG_DEFS_FILE@
+

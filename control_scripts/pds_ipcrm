@@ -1,0 +1,53 @@
+#!/bin/sh
+
+# Purpose: A shell script to delete the PDS IPC resources if not cleaned up
+#          by the PDS (e.g., after a crash)
+# Author:  Paul M. Breen
+# Date:    2000-05-18
+# Usage:   pds_ipcrm [pds_ipckey]
+
+if [ $# -lt 1 ]
+then
+  PDS_IPCKEY=0x0015b9a3           # Default PDS IPC key
+  PDS_SPI_IPCKEY=0x0015b9a4
+else
+  PDS_IPCKEY=$1
+  let "PDS_SPI_IPCKEY = $1 + 1"
+fi
+
+# Set up cut range to get IPC resource IDs from ipcs output
+KEYLEN=10
+IDLEN=9
+let "CR_START = $KEYLEN + 2"
+let "CR_END = $CR_START + ($IDLEN - 1)"
+CUT_RANGE="$CR_START-$CR_END"
+
+# See if any PDS IPC resources exist
+PDS_IPC_EXISTS=`ipcs | grep -i $PDS_IPCKEY`
+
+if [ ! -z "$PDS_IPC_EXISTS" ]
+then
+  # Get IPC resource ID for PDS shared memory segment then delete it
+  IPC_ID=`ipcs -m | grep -i $PDS_IPCKEY | cut -c $CUT_RANGE`
+  ipcrm shm $IPC_ID
+
+  # Get IPC resource ID for PDS semaphore array then delete it
+  IPC_ID=`ipcs -s | grep -i $PDS_IPCKEY | cut -c $CUT_RANGE`
+  ipcrm sem $IPC_ID
+
+  # Get IPC resource ID for PDS message queue then delete it
+  IPC_ID=`ipcs -q | grep -i $PDS_IPCKEY | cut -c $CUT_RANGE`
+  ipcrm msg $IPC_ID
+fi
+
+# Check to see if any PDS SPI IPC resources exist
+PDS_SPI_IPC_EXISTS=`ipcs | grep -i $PDS_SPI_IPCKEY`
+
+if [ ! -z "$PDS_SPI_IPC_EXISTS" ]
+then
+  # Get IPC resource ID for PDS SPI shared memory segment then delete it
+  IPC_ID=`ipcs -m | grep -i $PDS_SPI_IPCKEY | cut -c $CUT_RANGE`
+  ipcrm shm $IPC_ID
+fi
+
+exit 0

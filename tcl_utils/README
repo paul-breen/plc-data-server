@@ -1,0 +1,9 @@
+TK Utility
+==========
+
+This program, chkcnf, is used to read a plc.cnf file and then analyze the
+contents to make sure they fit within the rules of the data server.  It
+highlights duplicated tagnames, errors in ordering and ranging data blocks etc.
+
+The program can also connect to the PLC Data Server and as such look at the
+current values within tags.

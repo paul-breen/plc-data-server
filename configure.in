@@ -1,0 +1,409 @@
+dnl Autoconf input file for configuring the PLC Data Server
+dnl Process this file with autoconf to produce a configure script.
+
+dnl ********** DO INITIAL SETUP **********
+
+AC_INIT(server/pds_main.c)
+AC_PREFIX_DEFAULT(/usr/local/pds)
+AC_CONFIG_HEADER(include/pds_config.h)
+
+dnl Autoconf 2.12, at least, generates a useless relative path to install-sh
+dnl unless we do this.
+AC_CONFIG_AUX_DIR(`pwd`/auto-configure)
+
+AC_SUBST(SRCDIR)
+
+AC_CANONICAL_HOST
+PORTNAME=${host_os}
+CPU=${host_cpu}
+
+AC_SUBST(PORTNAME)
+AC_SUBST(CPU)
+
+dnl If the PDS version file exists, set PDS_VERSION
+if test -f PDS_VERSION
+then
+  PDS_VERSION=`cat PDS_VERSION`
+fi
+
+AC_SUBST(PDS_VERSION)
+
+dnl Set the 'C' preprocessor symbol PDS_VERSION
+AC_DEFINE_UNQUOTED(PDS_VERSION, "$PDS_VERSION")
+
+dnl Initialise CFLAGS
+CFLAGS="-D_SVID_SOURCE -O2"
+
+dnl Initialise LDFLAGS
+LDFLAGS="-Wall"
+
+dnl ********** GET CONFIGURE COMMAND LINE OPTIONS **********
+
+dnl Set header file directories
+AC_ARG_WITH(includes,
+[  --with-includes=DIR     site header files for tk/tcl, etc in DIR],
+[
+case "$withval" in
+  "" | y | ye | yes | n | no)
+  AC_MSG_ERROR([*** You must supply an argument to the --with-includes option.])
+  ;;
+esac
+INCLUDE_DIRS="$withval"
+])
+
+dnl Check if each directory exists & warn if a directory doesn't
+if test "$INCLUDE_DIRS" -o "$SRCH_INC"
+then
+  for dir in $INCLUDE_DIRS $SRCH_INC
+  do
+    if test -d "$dir"
+    then
+      PDS_CONF_INC_DIRS="$PDS_CONF_INC_DIRS -I$dir"
+    else
+      AC_MSG_WARN([*** Include directory $dir does not exist.])
+    fi
+  done
+fi
+
+dnl Set library file directories
+AC_ARG_WITH(libs,
+[  --with-libs=DIR         also search for libraries in DIR],
+[
+case "$withval" in
+  "" | y | ye | yes | n | no)
+  AC_MSG_ERROR([*** You must supply an argument to the --with-libs option.])
+  ;;
+esac
+LIBRARY_DIRS="$withval"
+])
+
+dnl Set library file directories (same as libs above)
+AC_ARG_WITH(libraries,
+[  --with-libraries=DIR    also search for libraries in DIR],
+[
+case "$withval" in
+  "" | y | ye | yes | n | no)
+  AC_MSG_ERROR([*** You must supply an argument to the --with-libraries option.])
+  ;;
+esac
+LIBRARY_DIRS="$withval"
+])
+
+dnl Check if each directory exists & warn if a directory doesn't
+if test "$LIBRARY_DIRS" -o "$SRCH_LIB"
+then
+  for dir in $LIBRARY_DIRS $SRCH_LIB
+  do
+    if test -d "$dir"
+    then
+      PDS_CONF_LIB_DIRS="$PDS_CONF_LIB_DIRS -L$dir"
+    else
+      AC_MSG_WARN([*** Library directory $dir does not exist.])
+    fi
+  done
+fi
+
+AC_SUBST(PDS_CONF_INC_DIRS)
+AC_SUBST(PDS_CONF_LIB_DIRS)
+
+dnl We exclude tcl support unless user says --with-tcl
+AC_MSG_CHECKING(setting USE_TCL)
+AC_ARG_WITH(tcl,
+[  --with-tcl              build Tcl interfaces],
+[
+case "$withval" in
+  y | ye | yes)
+  USE_TCL=true; AC_MSG_RESULT(enabled) ;;
+  *)
+  USE_TCL=; AC_MSG_RESULT(disabled) ;;
+esac
+],
+[ USE_TCL=; AC_MSG_RESULT(disabled) ]
+)
+
+AC_SUBST(USE_TCL)
+
+dnl We see if the path to the TCL configuration script is specified
+dnl This will overide the use of tclsh to find the paths to search
+AC_ARG_WITH(tclconfig,
+[  --with-tclconfig=DIR    tclConfig.sh is in DIR],
+[
+case "$withval" in
+  "" | y | ye | yes | n | no)
+  AC_MSG_ERROR([*** You must supply an argument to the --with-tclconfig option.])
+  ;;
+esac
+TCL_DIRS="$withval"
+]
+)
+
+dnl We exclude nwstub support unless user says --with-nwstub
+AC_MSG_CHECKING(setting USE_NWSTUB)
+AC_ARG_WITH(nwstub,
+[  --with-nwstub           run nwstub on PDS startup],
+[
+case "$withval" in
+  y | ye | yes)
+  USE_NWSTUB=true; AC_MSG_RESULT(enabled) ;;
+  *)
+  USE_NWSTUB=; AC_MSG_RESULT(disabled) ;;
+esac
+],
+[ USE_NWSTUB=; AC_MSG_RESULT(disabled) ]
+)
+
+AC_SUBST(USE_NWSTUB)
+
+dnl Set the nwstub host
+AC_ARG_WITH(nwstub_host,
+[  --with-nwstub-host=HOST nwstub host is HOST],
+[
+case "$withval" in
+  "" | y | ye | yes | n | no)
+  AC_MSG_ERROR([*** You must supply an argument to the --with-nwstub-host option.])
+  ;;
+esac
+NWSTUB_HOST="$withval"
+]
+)
+
+AC_SUBST(NWSTUB_HOST)
+
+dnl Set the nwstub port
+AC_ARG_WITH(nwstub_port,
+[  --with-nwstub-port=PORT nwstub port is PORT],
+[
+case "$withval" in
+  "" | y | ye | yes | n | no)
+  AC_MSG_ERROR([*** You must supply an argument to the --with-nwstub-port option.])
+  ;;
+esac
+NWSTUB_PORT="$withval"
+]
+)
+
+AC_SUBST(NWSTUB_PORT)
+
+dnl ********** CHECK FOR NECESSARY PROGRAMS & OPTIONS **********
+
+AC_PROG_CC
+AC_PROG_LEX
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PATH_PROG(AR, ar)
+AC_PATH_PROG(STRIP, strip)
+AC_PATH_PROG(IPCS, ipcs)
+AC_PATH_PROG(IPCRM, ipcrm)
+AC_PATH_PROG(TAR, tar)
+AC_PATH_PROGS(GZCAT, gzcat zcat gzip, gzcat)
+AC_PATH_PROGS(TCLSH, tclsh tcl)
+
+dnl Figure out how to invoke "install" and what install options to use.
+AC_PROG_INSTALL
+
+INSTL_OPTS="-m 644"
+INSTL_LIB_OPTS="-m 644"
+INSTL_SHLIB_OPTS="-m 755"
+INSTL_EXE_OPTS="-m 755"
+
+dnl HPUX wants shared libs to be mode 555.
+case "$host_os" in
+hpux*)
+  INSTL_SHLIB_OPTS="-m 555" ;;
+esac
+
+AC_SUBST(INSTALL)
+AC_SUBST(INSTL_OPTS)
+AC_SUBST(INSTL_LIB_OPTS)
+AC_SUBST(INSTL_SHLIB_OPTS)
+AC_SUBST(INSTL_EXE_OPTS)
+
+dnl !! MAKE SURE WE REVERT TO C COMPILER, NOT C++, FOR SUBSEQUENT TESTS !!
+AC_LANG_C
+
+dnl ********** CHECK FOR NECESSARY LIBRARIES **********
+
+dnl Check for a curses library.  If found, add to LIBS & set USE_CURSES
+USE_CURSES=
+for curses in ncurses curses
+do
+  AC_CHECK_LIB(${curses}, main,
+  [LIBS="-l${curses} $LIBS"; USE_CURSES=true; break])
+done
+
+AC_SUBST(USE_CURSES)
+
+dnl ********** CHECK FOR NECESSARY HEADERS **********
+
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_CHECK_HEADERS(arpa/inet.h)
+AC_CHECK_HEADERS(netdb.h)
+AC_CHECK_HEADERS(netinet/in.h)
+AC_CHECK_HEADERS(sys/select.h)
+AC_CHECK_HEADERS(sys/time.h)
+AC_CHECK_HEADERS(sys/types.h)
+AC_CHECK_HEADERS(sys/ipc.h)
+AC_CHECK_HEADERS(sys/sem.h)
+AC_CHECK_HEADERS(sys/shm.h)
+AC_CHECK_HEADERS(sys/msg.h)
+AC_CHECK_HEADERS(unistd.h)
+AC_CHECK_HEADERS(signal.h)
+AC_CHECK_HEADERS(termios.h)
+AC_CHECK_HEADERS(getopt.h)
+AC_CHECK_HEADERS(curses.h)
+
+dnl ********** CHECK FOR NECESSARY TYPEDEFS **********
+
+AC_TYPE_MODE_T
+AC_TYPE_SIZE_T
+AC_TYPE_PID_T
+AC_TYPE_SIGNAL
+
+dnl ********** CHECK FOR NECESSARY STRUCTURES **********
+
+AC_HEADER_TIME
+AC_STRUCT_TM
+
+AC_MSG_CHECKING(for union semun)
+AC_TRY_LINK(
+[#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>],
+[union semun semun;],
+[AC_DEFINE(HAVE_UNION_SEMUN) AC_MSG_RESULT(yes)],
+AC_MSG_RESULT(no))
+
+dnl ********** CHECK FOR COMPILER CHARACTERISTICS **********
+
+AC_C_CONST
+AC_C_STRINGIZE
+
+AC_MSG_CHECKING(for signed types)
+AC_TRY_COMPILE([],
+[signed char c; signed short s; signed int i;],
+[AC_MSG_RESULT(yes)],
+[AC_DEFINE(signed, ) AC_MSG_RESULT(no)])
+
+dnl Assume system is ELF if it predefines __ELF__ as 1,
+dnl otherwise believe "elf" setting from check of host_os above.
+AC_EGREP_CPP(yes,
+[
+#if __ELF__
+  yes
+#endif
+],
+ELF_SYS=true,
+[if test "X$elf" = "Xyes"
+then
+  ELF_SYS=true
+else
+  ELF_SYS=
+fi
+])
+AC_SUBST(ELF_SYS)
+
+dnl ********** CHECK FOR LIBRARY FUNCTIONS **********
+
+AC_FUNC_MEMCMP
+
+AC_MSG_CHECKING(for gettimeofday args)
+AC_TRY_LINK([#include <sys/time.h>],
+[struct timeval *tp; struct timezone *tzp; gettimeofday(tp,tzp); ],
+[AC_DEFINE(HAVE_GETTIMEOFDAY_2_ARGS) AC_MSG_RESULT(2 args)],
+AC_MSG_RESULT(no))
+
+dnl ********** CHECK FOR SYSTEM SERVICES **********
+
+dnl Check the option to echo to inhibit newlines
+AC_MSG_CHECKING(for inhibiting newlines with echo)
+if echo '\c' | grep -s c >/dev/null 2>&1
+then
+  ECHO_N="echo -n"
+  ECHO_C=""
+  AC_MSG_RESULT(using -n)
+else
+  ECHO_N="echo"
+  ECHO_C='\c'
+  AC_MSG_RESULT(using \c)
+fi
+
+AC_SUBST(ECHO_N)
+AC_SUBST(ECHO_C)
+
+dnl ********** CONFIGURE PACKAGE **********
+
+dnl Check if path to Tcl configuration script (tclConfig.sh) was passed
+dnl If it wasn't, and we can't find tclsh in path, then disable Tcl support
+if test -z "$TCL_DIRS"
+then
+  if test -z "$TCLSH"
+  then
+    AC_MSG_WARN(TCL support disabled; tcl shell is not in your path)
+    USE_TCL=
+  fi
+fi
+
+dnl Find the Tcl configuration script in the supplied paths or the tclsh
+dnl supplied paths
+if test "$USE_TCL" = true
+then
+  AC_MSG_CHECKING(for tclConfig.sh)
+  TCL_CONFIG_SH=
+  library_dirs=
+
+  dnl If path to tclConfig.sh not given, ask tclsh to supply it
+  if test -z "$TCL_DIRS"
+  then
+    library_dirs=`echo 'puts $auto_path' | $TCLSH`
+  fi
+  library_dirs="$TCL_DIRS $library_dirs"
+
+  dnl Search through all directories looking for tclConfig.sh
+  for dir in $library_dirs
+  do
+    if test -d "$dir" -a -r "$dir/tclConfig.sh"
+    then
+      TCL_CONFIG_SH=$dir/tclConfig.sh
+      break
+    fi
+  done
+
+  dnl If tclConfig.sh is not found, then disable Tcl support
+  if test -z "$TCL_CONFIG_SH"
+  then
+    AC_MSG_RESULT(no)
+    AC_MSG_WARN(TCL support disabled; Tcl configuration script missing)
+    USE_TCL=
+  else
+    AC_MSG_RESULT($TCL_CONFIG_SH)
+    AC_SUBST(TCL_CONFIG_SH)
+  fi
+fi
+
+dnl If the path to tclConfig.sh has been passed, get the contents of the file,
+dnl remove all single quotes around variables' values & then store the
+dnl modified contents in TCL_CONFIG_LOCAL.  This file is then input for
+dnl TCL_CONFIG_DEFS_FILE
+if test "$USE_TCL" = true
+then
+  if test ! -z "$TCL_CONFIG_SH"
+  then
+    # Make a local copy of TCL config file & remove single quotes
+    TCL_CONFIG_LOCAL=".tcldefs.local"
+    sed -e /tmp-tcldefs/r $TCL_CONFIG_SH -e s/\'//g > $TCL_CONFIG_LOCAL
+
+    AC_MSG_RESULT(reading definitions from $TCL_CONFIG_SH)
+    AC_SUBST_FILE(TCL_CONFIG_DEFS_FILE) 
+    TCL_CONFIG_DEFS_FILE=$TCL_CONFIG_LOCAL
+  fi
+fi
+
+dnl ********** CREATE CONFIGURED OUTPUT **********
+
+dnl Finally ready to produce output files ...
+AC_OUTPUT(
+	Makefile.defs
+	Makefile.tcldefs
+	control_scripts/pds
+)

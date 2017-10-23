@@ -1,0 +1,186 @@
+/******************************************************************************
+* PROJECT:  PLC Data Server Documentation Project                             * 
+* MODULE:   pds.css                                                           *
+* PURPOSE:  This is the Cascading Style Sheet for the PDS Project             *
+* AUTHOR:   Paul M. Breen                                                     *
+* DATE:     1999-12-21                                                        *
+******************************************************************************/
+
+/* Define a main style for html text */
+.mainText
+{
+  font-family: arial, helvetica, sans-serif; 
+  font-size: 10pt;
+}
+
+/* Define a style for fixed pitch font text */
+.fixedText
+{
+  font-family: courier;
+  font-size: 10pt;
+  text-align: center; 
+}
+
+/* Define a style for 'alert' text - to catch the user's attention */
+.alertText
+{
+  font-family: courier;
+  font-size: 18pt;
+  font-style: italic;
+  color: red; 
+}
+
+/* Define a style for a table that is used solely for form layout purposes */
+.layoutTable
+{
+  background: beige; 
+  border: none;
+}
+
+/* Define a style for a table that is used for data presentation purposes */
+.dataTable
+{
+  background: silver; 
+  border: 3px ridge silver; 
+}
+
+/* Define a style for a numeric table cell */
+.numericCell
+{
+  text-align: right; 
+}
+
+/* Define a style for an error table cell */
+.errCell
+{
+  background: red; 
+  color: white; 
+}
+
+/* Define a style for a table header cell */
+.tableHeaderCell
+{
+  font-style: bold;
+  background: powderblue; 
+  color: black; 
+}
+
+/* Define a 'hidden' link style (no text underline) */
+.hiddenLink
+{
+  text-decoration: none;
+}
+
+/* Define a Heading 1 style - for Page headings */
+H1 { font-family: arial, helvetica, sans-serif; font-size: 18pt; text-align: center; }
+
+/* Define a Heading 2 style - for Page sub-headings */
+H2 { font-family: arial, helvetica, sans-serif; font-size: 16pt; text-align: center; }
+
+/* Define a Heading 3 style - for Page sub-headings */
+H3 { font-family: arial, helvetica, sans-serif; font-size: 14pt; }
+
+/* Define a Heading 4 style - for Page sub-headings */
+H4 { font-family: arial, helvetica, sans-serif; font-size: 12pt; text-align: center; }
+
+/* Define a Heading 5 style - for Page sub-headings */
+H5 { font-family: arial, helvetica, sans-serif; font-size: 10pt; text-align: center; }
+
+/* Define a Heading 6 style - for the 'Program Information' footer */
+H6 { font-family: arial, helvetica, sans-serif; font-size: 8pt; color: green; }
+
+/* Define a Body style */
+BODY
+{ 
+  background: beige repeat fixed top left;
+  link: blue;
+  vlink: purple;
+  alink: red;
+}
+
+/* Define a Table style - set colour and border */
+TABLE
+{ 
+  background: beige; 
+  border: 3px ridge silver; 
+}
+
+/* Define a Table row style - set colour and border */
+TR
+{ 
+  background: beige; 
+  border: 3px ridge; 
+}
+
+/* Define a Table data (cell) style - set colour, border and padding */
+TD
+{ 
+  font-family: arial, helvetica, sans-serif; 
+  font-size: 10pt;
+  background: wheat; 
+  border: 3px ridge; 
+  padding: 0px 10px 0px 10px; 
+}
+
+/* Define an emphasized text style - set colour */
+EM
+{ 
+  color: blue;
+}
+
+/* Define an strong text style - set colour and font size */
+STRONG
+{ 
+  color: blue;
+  font-size: 125%;
+}
+
+
+/* Define styles for form controls */
+
+/* Define a radio button style */
+.rButton
+{
+  background: beige; 
+  color: black; 
+}
+
+/* Define a check box style */
+.cBox
+{
+  background: beige; 
+  color: black; 
+}
+
+/* Define a list box (select) style */
+.lBox
+{
+  background: beige; 
+  color: black; 
+}
+
+/* Define a button style (submit, reset) */
+.button
+{
+  background: steelblue; 
+  color: white; 
+  height: 40;
+  width: 120;
+}
+
+/* Define a button style (submit, reset) for inclusion in a table */
+.tableButton
+{
+  font-size: 75%;
+  background: steelblue; 
+  color: white; 
+  height: 40;
+  width: 120;
+}
+
+/* Define a read only style (text inputs) */
+.readOnly
+{
+  background: beige; 
+}
+

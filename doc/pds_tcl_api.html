@@ -1,0 +1,169 @@
+<HTML>
+<HEAD>
+<TITLE>PLC Data Server Tcl API</TITLE>
+<LINK REL=STYLESHEET TYPE="text/css" HREF="pds.css">
+</HEAD>
+
+<BODY CLASS=mainText>
+<H1>PLC Data Server Tcl API</H1>
+<H2>Library information</H2>
+<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=2 CELLSPACING=0 FRAME=RHS RULES=COLS>
+	<COL WIDTH=9*>
+	<COL WIDTH=79*>
+	<COL WIDTH=168*>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P>Name</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P>libpds_tcl</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Install directories</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">/home/lib /home/include</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Source Directories</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">$PDSDIST/lib/modules/pds_tcl</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Make Directory</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">$PDSDIST/lib/libs/libpds_tcl</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Library Dependencies</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">libpds</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Headers</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">pds_tcl.h</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Libraries</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">libpds_tcl.so.1</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=3%>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=31%>
+			<P STYLE="margin-top: 0.1in">Written in</P>
+		</TD>
+		<TD WIDTH=66%>
+			<P STYLE="margin-top: 0.1in">C</P>
+		</TD>
+	</TR>
+</TABLE>
+
+<H2>Outline</H2>
+<P>This library provides client scripts with a Tcl programming language Application Programming Interface (API) to the <A HREF="pds_glossary.html#pds">PLC Data Server</A> (PDS).  The API uses a <A HREF="pds_glossary.html#tag">tag abstraction</A>.</P>
+
+<H2>Methods</H2>
+<P>pdsconnect<BR>
+This command allows a client script to connect to the PDS.<BR>
+A server connection key is passed to the command.  If the
+connection key is NULL or zero, then a <A HREF="pds_glossary.html#pds_ipckey">default</A> is used.
+The PDS IPC key is passed to the command.
+An attempt is made to connect the client script to the PDS
+and if successful the connection ID is returned.  If an
+error occurs a stack trace is produced and a TCL_ERROR is
+returned.
+
+<P>pdsdisconnect<BR>
+This command allows a client script to disconnect from the PDS (unregister from the <A HREF="pds_glossary.html#pds_ipc_resources">PDS's IPC resources</A> and free memory for the connection structure).<BR>
+The connection ID is passed to the command.
+An attempt is made to disconnect the client script from
+the PDS and if successful the connection is closed.  If an
+error occurs a stack trace is produced and a TCL_ERROR is
+returned.
+
+<P>pdsget_tag<BR>
+This command allows a client script to get a tag's value.<BR>
+A valid connection ID and the tagname to get the value for are passed to the command.
+The tag's value in the PLC is returned.  If an error occurs a stack trace is produced and a TCL_ERROR is returned.
+
+<P>pdsget_strtag<BR>
+This command allows a client script to get a contiguous string of tags' values as a single value (formatted).<BR>
+A valid connection ID, the tagname (base), the number of tagvalues to read and a <A HREF="pds_glossary.html#fmtspec">data format specifier</A> are passed to the command.
+The tags' value in the PLC are returned as a single item of
+data.  If an error occurs a stack trace is produced and a
+TCL_ERROR is returned.
+
+<P>pdsset_tag<BR>
+This command allows a client script to set a tag's value.<BR>
+A valid connection ID, the tagname (base), and a variable number of tagvalues to set the value of are passed to the command.
+The tag value(s) is set in the PLC.  If an error occurs a
+stack trace is produced and a TCL_ERROR is returned else a
+flag is returned indicating whether value(s) were set.
+
+<P>
+<CENTER>
+<TABLE HEIGHT="60" BORDER="3" BGCOLOR="#C0C0C0"><TR>
+<TD ALIGN="CENTER" COLSTART="1" HEIGHT="40" WIDTH="140"><A HREF="index.html">Back to PLC Data Server Overview</A></TD>
+<TD ALIGN="CENTER" COLSTART="2" HEIGHT="40" WIDTH="140">&nbsp</TD>
+<TD ALIGN="CENTER" COLSTART="3" HEIGHT="40" WIDTH="140">&nbsp</TD>
+<TD ALIGN="CENTER" COLSTART="4" HEIGHT="40" WIDTH="140">&nbsp</TD>
+<TD ALIGN="CENTER" COLSTART="5" HEIGHT="40" WIDTH="140">&nbsp</TD>
+</TR> 
+</TABLE>
+</CENTER>
+
+<H6>Last updated on 2000-06-05<BR>
+Paul M. Breen</H6><BR>
+</BODY>
+</HTML>
+
