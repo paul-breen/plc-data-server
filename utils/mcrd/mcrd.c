@@ -536,7 +536,7 @@ int mcrd_main(plctaglist *taglist)
 
       /* Construct the date/time heading and print it */
       clock = time(NULL); 
-      strftime(date_heading, DTHDR_LEN, "%d/%m/%y %H:%M:%S", localtime(&clock));
+      strftime(date_heading, DTHDR_LEN, DTHDR_FMT, localtime(&clock));
 
       mvwprintw(hdrwin, DEFP_Y, (HW_COLS - (DTHDR_LEN + DEFP_X)), "%s", date_heading);
       wrefresh(hdrwin);

@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
   if(PDScheck_conn_status(conn) == PDS_CONN_OK)
   {
     /* Print the header */
-    printf("%-18s|%-39s|%9s|%10s\n", "TIME", "TAG", "VALUE", "PREVIOUS");
+    printf("%-19s|%-40s|%9s|%9s\n", "TIME", "TAG", "VALUE", "PREVIOUS");
     UNDERLINE(80);
 
     /* Get a pointer to the tag.  N.B.:  We search through ALL tags
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
           /* Construct the date/time stamp */
           strftime(tmstamp, TMSTAMP_LEN, TMSTAMP_FMT, localtime(&p->mtime));
 
-          printf("%-18s|%-39s|%9u|%10u\n", tmstamp, tagname, p->value, prev_val);
+          printf("%-19s|%-40s|%9u|%9u\n", tmstamp, tagname, p->value, prev_val);
 
           prev_val = p->value;
         }

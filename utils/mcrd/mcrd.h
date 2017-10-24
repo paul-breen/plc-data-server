@@ -33,7 +33,8 @@
 #define DW_OFFSET	1
 #define DW_TAGLEN	50
 #define DW_VALLEN	10
-#define DTHDR_LEN	18
+#define DTHDR_FMT	"%Y-%m-%dT%H:%M:%S"
+#define DTHDR_LEN	26
 #define ERRMSG_PAUSE	1
 #define ERRMSG_LGPAUSE	2
 
