@@ -1,1 +1,27 @@
 tmp
+
+# Ignore object files and libraries
+*.o
+*.a
+*.so
+
+# Explicitly ignore built binaries and ./configure generated output
+.tcldefs.local
+Makefile.defs
+Makefile.tcldefs
+config.log
+config.status
+control_scripts/pds
+include/pds_config.h
+nwstub/pds_nwstubd
+server/pdsd
+utils/addrmm/addrmm
+utils/cnf-read/cnf-read
+utils/force_tag_status/force_tag_status
+utils/mcrd/mcrd
+utils/nwtio/nwtio
+utils/pds_ctl/pds_ctl
+utils/plcmm/plcmm
+utils/spimm/spimm
+utils/tem/tem
+utils/tio/tio
