@@ -77,6 +77,21 @@ global pdsconn
 
 
 ###############################################################################
+# Function to convert a byte to its printable char representation or '.'
+###############################################################################
+proc ByteToPrintChar {byte} {
+  set char {.}
+
+  if {$byte >= 32 && $byte <= 126} {
+    set char [format "%c" $byte]
+  }
+
+  return $char
+}
+
+
+
+###############################################################################
 # Function to scan PLC tags listed in selectedarray
 ###############################################################################
 proc ScanPLC {} {
@@ -104,16 +119,8 @@ global selectedarray IPCKEY READPLC pdsconn PRINT_CURR_VAL_TOP
             set high [expr $result & 0xff00]
             set high [expr $high >> 8]
             set low [expr $result & 0x00ff]
-            if { $high < 32 || $high > 126} {
-               set highchar {.}
-            } else {
-               set highchar [format "%c" $high] 
-            }  
-            if { $low < 32 || $low > 126} {
-               set lowchar {.}
-            } else {
-               set lowchar [format "%c" $low]
-            }  
+            set highchar [ByteToPrintChar $high]
+            set lowchar [ByteToPrintChar $low]
             append msg [leadpad $result 6]
             append msg {, }
             append msg [leadpad $high 3]
@@ -175,34 +182,89 @@ proc ClearList {boxname} {
 
 
 ###############################################################################
+# Function to set the status of the given frame
+###############################################################################
+proc IndicateStatusFrame {framename status} {
+  if {$status == 0} {
+    $framename configure -bg {Green}
+  } else {
+    $framename configure -bg {Red}
+  }
+}
+
+
+
+###############################################################################
+# Function to set the status of a selected file's tags
+###############################################################################
+proc IndicateTagsStatus {status} {
+  IndicateStatusFrame .tagframe.statusframe $status
+}
+
+
+
+###############################################################################
+# Function to set the status of a selected file's blocks
+###############################################################################
+proc IndicateBlocksStatus {status} {
+  IndicateStatusFrame .blockframe.statusframe $status
+}
+
+
+
+###############################################################################
+# Function to validate a selected file
+###############################################################################
+proc ValidateFile {fd} {
+  global blockerr selectedarray
+
+  set blockerr 0
+  set selectedarray {}
+
+  plcs $fd
+  headers $fd
+  blocksize $fd
+  chkorder $fd 
+  chkqty $fd
+  chktags $fd
+
+  IndicateBlocksStatus $blockerr
+}
+
+
+
+###############################################################################
+# Function to enable functionality for a validated file
+###############################################################################
+proc EnableValidFileFunctionality {filename} {
+  .mainmenu.filemenu entryconfigure 1 -state normal
+  .mainmenu.editmenu entryconfigure 0 -state normal
+  .mainmenu.plcmenu entryconfigure 0 -state normal
+  bind . <Control-R> {ReloadFile $filename}
+  bind . <Control-r> {ReloadFile $filename}
+  bind . <Control-C> {ConnectPLC}
+  bind . <Control-c> {ConnectPLC}
+  bind . <Control-F> {SearchBox}
+  bind . <Control-f> {SearchBox}
+}
+
+
+
+###############################################################################
 # Function to select a file to work on
 ###############################################################################
 proc ReloadFile {filename} {
-global blockerr selectedarray
+   global blockerr selectedarray
 
    set blockerr 0
    set selectedarray {}
 
-   if { [string length $filename] == 0 } {
-      # No file chosen
-   } else {
-      #
+   if { [string length $filename] != 0 } {
       set fd [fileopen $filename r]
 
       if { [string compare $fd {error}] != 0 } {
-         # File is open
-         plcs $fd
-         headers $fd
-         blocksize $fd
-         chkorder $fd 
-         chkqty $fd
-         chktags $fd
+         ValidateFile $fd
          close $fd
-         if {$blockerr == 0} {
-            .blockframe.statusframe configure -bg {Green} 
-         } else { 
-            .blockframe.statusframe configure -bg {Red} 
-         }
       }
    }
 }
@@ -213,42 +275,28 @@ global blockerr selectedarray
 # Function to select a file to work on
 ###############################################################################
 proc ChooseFile {} {
-global filename blockerr selectedarray dir .mainmenu.filemenu .mainmenu.editmenu .mainmenu.plcmenu
+   global filename blockerr selectedarray dir
 
+   set suffix ".cnf"
+   set init_filename "plc${suffix}"
+   set types [list [list "PDS Configurations" $suffix] {"All Files" *}]
+   set title "Open Cnf File"
    set oldfilename $filename
-   set filename [tk_getOpenFile -defaultextension {.cnf} -initialdir $dir -title {Open Cnf File}]
+   set filename [tk_getOpenFile -initialdir $dir -initialfile $init_filename -filetypes $types -title $title]
+
    if { [string length $filename] == 0 } {
       # No file chosen so reset to last one
       set filename $oldfilename 
    } else {
-      #
       set blockerr 0
       set selectedarray {}
-      set fd [fileopen $filename r]
       set dir [dirpath $filename]
+      set fd [fileopen $filename r]
+
       if { [string compare $fd {error}] != 0 } {
-         # File is open
-         plcs $fd
-         headers $fd
-         blocksize $fd
-         chkorder $fd 
-         chkqty $fd
-         chktags $fd
+         ValidateFile $fd
          close $fd
-         if {$blockerr == 0} {
-            .blockframe.statusframe configure -bg {Green} 
-         } else { 
-            .blockframe.statusframe configure -bg {Red} 
-         }
-         .mainmenu.filemenu entryconfigure 1 -state normal      
-         .mainmenu.editmenu entryconfigure 0 -state normal      
-         .mainmenu.plcmenu entryconfigure 0 -state normal      
-         bind . <Control-R> {ReloadFile $filename}
-         bind . <Control-r> {ReloadFile $filename}
-         bind . <Control-C> {ConnectPLC}
-         bind . <Control-c> {ConnectPLC}
-         bind . <Control-F> {SearchBox}
-         bind . <Control-f> {SearchBox}
+         EnableValidFileFunctionality $filename
       }
    }
 }
@@ -259,8 +307,6 @@ global filename blockerr selectedarray dir .mainmenu.filemenu .mainmenu.editmenu
 # Procedure to open a file and return the handle or an error
 ###############################################################################
 proc fileopen {file mode} {
-global pathname
-
    if { [file isfile $file] == 1 } {
      if [catch {open $file $mode} fhandle] {
         tk_messageBox -type ok -message {Failed to open file!} -icon error -title {Error}
@@ -459,18 +505,17 @@ global tab tagarray fulltags
       set msg {================================================}
       .tagframe.listbox insert 0 $msg 
       if { $cnt == 0 } {
-         .tagframe.listbox insert 1 {OK - All tags unique} 
-         .tagframe.statusframe configure -bg {Green} 
+         .tagframe.listbox insert 1 {OK - All tags unique}
       } else {
-         .tagframe.statusframe configure -bg {Red} 
          set msg {ERROR! }
-         append msg $cnt 
-         append msg { pair(s) of duplicated tags} 
-         .tagframe.listbox insert 1 $msg 
+         append msg $cnt
+         append msg { pair(s) of duplicated tags}
+         .tagframe.listbox insert 1 $msg
       }
       set msg {================================================}
-      .tagframe.listbox insert 2 $msg 
-   } 
+      .tagframe.listbox insert 2 $msg
+      IndicateTagsStatus $cnt
+   }
 }
 
 
@@ -1152,7 +1197,6 @@ global fulltags
          } 
       }
    }
-   update
 }
 
 
@@ -1161,53 +1205,63 @@ global fulltags
 # Function to present the Summary dialog box
 ###############################################################################
 proc SearchBox {} {
-global windname fulltags match fontfix
+   global windname fulltags match fontfix
 
    set windname .searchbox
    set bg {Light Yellow}
+   set padx 5
+   set pady $padx
    set searchstr {}
 
    if { [winfo exists $windname] == 1 } {
       puts "Window exists so raising it!"
       raise $windname
    } else {
-      toplevel $windname -class Toplevel -background $bg
+      toplevel $windname -class Toplevel -background $bg -padx $padx -pady $pady
       wm title $windname "Search" 
       wm geometry $windname 700x460+50+40
-      wm maxsize $windname 700 460
       wm minsize $windname 700 460
       wm overrideredirect $windname 0
-      wm resizable $windname 0 0
       wm deiconify $windname 
-      label $windname.label0 -background $bg -text Tagname: 
-      entry $windname.entry0 -background {White} -foreground {Black} -textvariable searchstr
-      frame $windname.radioframe -borderwidth 2 -relief sunken -background {Light Grey}
-      label $windname.radioframe.label0 -background {Light Grey} -text {Matching criteria } 
-      radiobutton $windname.radioframe.exact -background {Light Grey} -text {Exact} -variable match -value 0 
-      radiobutton $windname.radioframe.close -background {Light Grey} -text {Contains} -variable match -value 1
-      listbox $windname.listbox -font $fontfix -xscrollcommand "$windname.scrollx set" -yscrollcommand "$windname.scrolly set"
+
+      # Configure the widgets for the window
+      label $windname.label0 -background $bg -text {Tagname:}
+      entry $windname.entry0 -background {White} -foreground {Black} -textvariable searchstr -width 45
+
+      label $windname.label1 -background $bg -text {Matching criteria} 
+      frame $windname.radioframe -background $bg
+      radiobutton $windname.radioframe.exact -background $bg -text {Exact} -variable match -value 0 
+      radiobutton $windname.radioframe.close -background $bg -text {Contains} -variable match -value 1
+
+      listbox $windname.listbox -font $fontfix -xscrollcommand "$windname.scrollx set" -yscrollcommand "$windname.scrolly set" -width 45 -height 10
       scrollbar $windname.scrollx -orient horizontal -command "$windname.listbox xview"
       scrollbar $windname.scrolly -orient vertical -command "$windname.listbox yview"
-      button $windname.closebutton -padx 9 -pady 3 -text {Close} -command {CloseDialog $windname}
+
+      button $windname.closebutton -padx 9 -pady 3 -text {Close} -command {CloseDialog $windname} -width 8
       button $windname.searchbutton -padx 9 -pady 3 -text {Search} -command {SearchFor $searchstr $match $windname}
-      place $windname.label0 -x 10 -y 15 -anchor nw
-      place $windname.entry0 -x 100 -y 15 -width 450 -anchor nw
-      place $windname.radioframe -x 10 -y 60 -width 680 -height 45 -anchor nw
-      place $windname.radioframe.label0 -x 10 -y 10 -anchor nw
-      place $windname.radioframe.exact -x 210 -y 10 -anchor nw
-      place $windname.radioframe.close -x 400 -y 10 -anchor nw
-      place $windname.listbox -x 10 -y 120 -width 660 -height 260 -anchor nw -bordermode ignore
-      place $windname.scrollx -x 10 -y 380 -width 660 -height 20 -anchor nw
-      place $windname.scrolly -x 670 -y 120 -width 20 -height 260 -anchor nw
-      place $windname.closebutton -x 320 -y 415 -width 60 -height 30 -anchor nw -bordermode ignore      
-      place $windname.searchbutton -x 610 -y 10 -width 60 -height 30 -anchor nw -bordermode ignore      
-      nomin $windname
+
+      # Layout the window
+      grid $windname.label0 -padx $padx -pady $pady -sticky w
+      grid $windname.entry0 -column 1 -row 0 -padx $padx -pady $pady -sticky nsew
+      grid $windname.searchbutton x -column 2 -row 0 -padx $padx -pady $pady
+
+      grid $windname.label1 -row 1 -sticky w
+      grid $windname.radioframe -column 1 -row 1 -padx $padx -pady $pady -sticky nsew
+      grid $windname.radioframe.exact $windname.radioframe.close -row 1 -sticky ew
+
+      grid $windname.listbox $windname.scrolly -sticky nsew -columnspan 3
+      grid $windname.scrollx -columnspan 3 -sticky nsew
+      grid $windname.closebutton -pady $pady -columnspan 3
+
+      # Resize the widgets with the window
+      grid columnconfigure $windname "0 1" -weight 1
+      grid rowconfigure $windname 2 -weight 1
+
+      # Key bindings
+      focus $windname.entry0
+      bind $windname <Return> {SearchFor $searchstr $match $windname}
+      bind $windname <Escape> {CloseDialog $windname}
    } 
-   update
-   catch {focus $windname}
-   # PMB - The grab shouldn't be global!  This stops the user from being able
-   #       to switch to any other running application on screen!
-   catch {grab set -local $windname}
 }
 
 
@@ -1230,7 +1284,6 @@ global fontfix windname filename selectedarray
          # Delete from selectedarray
          set selectedarray [lreplace $selectedarray $pos $pos]
          .onlinebox.selframe.listbox delete $pos
-         update
       }
    }
 }
@@ -1263,7 +1316,10 @@ global fontfix windname filename selectedarray
 # Function to present the Online dialog box
 ###############################################################################
 proc OnlineBox {} {
-global fontfix windname filename tagarray selectedarray pdsconn
+   global fontfix windname filename tagarray selectedarray pdsconn
+
+   set padx 5
+   set pady $padx
 
    if {[string length $filename] == 0} {
       tk_messageBox -type ok -message {No configuration file has been opened yet!} -icon error -title {Error}
@@ -1274,28 +1330,27 @@ global fontfix windname filename tagarray selectedarray pdsconn
          puts "Window exists so raising it!"
          raise $windname
       } else {
-         toplevel $windname -class Toplevel -background $bg
+         toplevel $windname -class Toplevel -background $bg -padx $padx -pady $pady
          wm title $windname "Online to PLC" 
          wm geometry $windname 780x560+5+5
-         wm maxsize $windname 780 560
          wm minsize $windname 780 560
          wm overrideredirect $windname 0
-         wm resizable $windname 0 0
          wm deiconify $windname 
 
+         # Configure the widgets for the window
          frame $windname.tagframe -borderwidth 2 -relief sunken
          label $windname.tagframe.label1 -borderwidth 1 -text {Tag Names}
-         listbox $windname.tagframe.listbox -font $fontfix -yscrollcommand "$windname.tagframe.scroller set"
+         listbox $windname.tagframe.listbox -font $fontfix -yscrollcommand "$windname.tagframe.scroller set" -width 45 -height 10
          scrollbar $windname.tagframe.scroller -orient vertical -command "$windname.tagframe.listbox yview"
 
          frame $windname.selframe -borderwidth 2 -relief sunken
          label $windname.selframe.label1 -borderwidth 1 -text {Selected}
-         listbox $windname.selframe.listbox -font $fontfix -yscrollcommand "$windname.selframe.scroller set"
+         listbox $windname.selframe.listbox -font $fontfix -yscrollcommand "$windname.selframe.scroller set" -width 45 -height 10
          scrollbar $windname.selframe.scroller -orient vertical -command "$windname.selframe.listbox yview"
 
          frame $windname.ansframe -borderwidth 2 -relief sunken
-         label $windname.ansframe.label1 -borderwidth 1 -text {Results}
-         listbox $windname.ansframe.listbox -font $fontfix -yscrollcommand "$windname.ansframe.scroller set"
+         label $windname.ansframe.label1 -borderwidth 1 -text {Results (word, highbyte, lowbyte, highchar lowchar)}
+         listbox $windname.ansframe.listbox -font $fontfix -yscrollcommand "$windname.ansframe.scroller set" -width 70 -height 10
          scrollbar $windname.ansframe.scroller -orient vertical -command "$windname.ansframe.listbox yview"
 
          button $windname.startbutton -padx 9 -pady 3 -text {Start} -command {set READPLC 1; ScanPLC}
@@ -1303,27 +1358,51 @@ global fontfix windname filename tagarray selectedarray pdsconn
          button $windname.clearbutton -padx 9 -pady 3 -text {Clear} -command {ClearList $windname.ansframe.listbox}
          button $windname.closebutton -padx 9 -pady 3 -text {Close} -command {set READPLC 0; CloseDialog $windname}
 
-         place $windname.tagframe -x 10 -y 20 -width 370 -height 195 -anchor nw -bordermode ignore
-         place $windname.tagframe.label1 -x 30 -y 10 -anchor nw -bordermode ignore
-         place $windname.tagframe.listbox -x 15 -y 35 -width 315 -height 140 -anchor nw -bordermode ignore
-         place $windname.tagframe.scroller -x 330 -y 35 -width 20 -height 140 -anchor nw
+         # Layout the window
+         grid $windname.tagframe -sticky nsew -columnspan 2
+         grid $windname.selframe -column 2 -row 0 -sticky nsew -columnspan 2
 
-         place $windname.selframe -x 400 -y 20 -width 370 -height 195 -anchor nw -bordermode ignore
-         place $windname.selframe.label1 -x 30 -y 10 -anchor nw -bordermode ignore
-         place $windname.selframe.listbox -x 15 -y 35 -width 315 -height 140 -anchor nw -bordermode ignore
-         place $windname.selframe.scroller -x 330 -y 35 -width 20 -height 140 -anchor nw
+         grid $windname.tagframe.label1 -padx $padx -sticky w
+         grid $windname.tagframe.listbox $windname.tagframe.scroller -sticky nsew -row 1
+
+         grid $windname.selframe.label1 -padx $padx -sticky w
+         grid $windname.selframe.listbox $windname.selframe.scroller -sticky nsew -row 1
   
-         place $windname.ansframe -x 10 -y 225 -width 570 -height 250 -anchor nw -bordermode ignore
-         place $windname.ansframe.label1 -x 30 -y 10 -anchor nw -bordermode ignore
-         place $windname.ansframe.listbox -x 15 -y 35 -width 515 -height 195 -anchor nw -bordermode ignore
-         place $windname.ansframe.scroller -x 530 -y 35 -width 20 -height 195 -anchor nw
+         grid $windname.ansframe -sticky nsew -columnspan 3 -rowspan 3
+         grid $windname.ansframe.label1 -padx $padx -sticky w
+         grid $windname.ansframe.listbox $windname.ansframe.scroller -sticky nsew -row 1
 
-         place $windname.startbutton -x 650 -y 235 -width 60 -height 30 -anchor nw -bordermode ignore      
-         place $windname.stopbutton -x 650 -y 300 -width 60 -height 30 -anchor nw -bordermode ignore      
-         place $windname.clearbutton -x 650 -y 365 -width 60 -height 30 -anchor nw -bordermode ignore      
-         place $windname.closebutton -x 360 -y 510 -width 60 -height 30 -anchor nw -bordermode ignore      
-         nomin $windname
-      } 
+         grid $windname.startbutton -column 3 -row 1
+         grid $windname.stopbutton -column 3 -row 2
+         grid $windname.clearbutton -column 3 -row 3
+         grid $windname.closebutton -pady $pady -columnspan 4
+
+         # Resize the widgets with the window
+         grid columnconfigure $windname "0 1 2 3" -weight 1
+         grid rowconfigure $windname "0 1 2 3" -weight 1
+
+         grid columnconfigure $windname.tagframe 0 -weight 1
+         grid rowconfigure $windname.tagframe 1 -weight 1
+
+         grid columnconfigure $windname.selframe 0 -weight 1
+         grid rowconfigure $windname.selframe 1 -weight 1
+
+         grid columnconfigure $windname.ansframe 0 -weight 1
+         grid rowconfigure $windname.ansframe 1 -weight 1
+
+         # Key bindings
+         focus $windname.tagframe.listbox
+         bind $windname.tagframe.listbox <Double-1> {AddSelected [$windname.tagframe.listbox get [%W curselection]]}
+         bind $windname.tagframe.listbox <Return> {AddSelected [$windname.tagframe.listbox get [%W curselection]]}
+         bind $windname.selframe.listbox <Double-1> {DelSelected [$windname.selframe.listbox get [%W curselection]] [%W curselection]}
+         bind $windname.selframe.listbox <Return> {DelSelected [$windname.selframe.listbox get [%W curselection]] [%W curselection]}
+         bind $windname.startbutton <Return> {set READPLC 1; ScanPLC}
+         bind $windname.stopbutton <Return> {set READPLC 0}
+         bind $windname.clearbutton <Return> {ClearList $windname.ansframe.listbox}
+         bind $windname.closebutton <Return> {set READPLC 0; CloseDialog $windname}
+         bind $windname <Escape> {set READPLC 0; CloseDialog $windname}
+      }
+
       # Load all available tags
       for {set x 0} {$x < [llength $tagarray]} {incr x} {
          set mess [lindex $tagarray $x]
@@ -1334,17 +1413,6 @@ global fontfix windname filename tagarray selectedarray pdsconn
          set mess [lindex $selectedarray $x]
          $windname.selframe.listbox insert end $mess 
       }
-
-      update
-      catch {focus $windname}
-      # PMB - The grab shouldn't be global!  This stops the user from
-      # being able to switch to any other running application on screen!
-      # catch {grab set -global $windname}
-      catch {grab set -local $windname}
-
-      bind $windname.tagframe.listbox <Double-1> {AddSelected [$windname.tagframe.listbox get [%W curselection]]}
-      bind $windname.selframe.listbox <Double-1> {DelSelected [$windname.selframe.listbox get [%W curselection]] [%W curselection]}
-
    }
 }
 
@@ -1354,42 +1422,12 @@ global fontfix windname filename tagarray selectedarray pdsconn
 # Function to present the About dialog box
 ###############################################################################
 proc AboutBox {} {
-global windname version 
+  global pds_version tcl_patchLevel
 
-   set windname .aboutbox
-   set bg {Light Yellow}
-   if { [winfo exists $windname] == 1 } {
-      puts "Window exists so raising it!"
-      raise $windname
-   } else {
-      toplevel $windname -class Toplevel -background $bg
-      wm title $windname "About plc.cnf Checker" 
-      wm geometry $windname 400x140+200+140
-      wm maxsize $windname 400 140
-      wm minsize $windname 400 140
-      wm overrideredirect $windname 0
-      wm resizable $windname 0 0
-      wm deiconify $windname 
-      label $windname.label0 -background $bg -text $version
-      label $windname.label1 -background $bg -text "Written using Tcl/Tk"
-      label $windname.label2 -background $bg -text "by" 
-      label $windname.label3 -background $bg -text "Paul M. Breen" 
-      button $windname.okbutton -padx 9 -pady 3 -text {OK} -command {CloseDialog $windname}
-      place $windname.label0 -x 160 -y 10 -anchor nw
-      place $windname.label1 -x 40 -y 30 -anchor nw
-      place $windname.label2 -x 40 -y 50 -anchor nw
-      place $windname.label3 -x 140 -y 50 -anchor nw
-      place $windname.okbutton -x 170 -y 100 -width 60 -height 30 -anchor nw -bordermode ignore      
-      nomin $windname
-   } 
-   update
-   bind $windname <Return> {CloseDialog $windname}
-   bind $windname <Escape> {CloseDialog $windname}
-   catch {focus $windname}
-   # PMB - The grab shouldn't be global!  This stops the user from
-   # being able to switch to any other running application on screen!
-   # catch {grab set -global $windname}
-   catch {grab set -local $windname}
+  set title "About"
+  set message "PDS: $pds_version\nTcl/Tk: $tcl_patchLevel\nAuthor: Paul M. Breen"
+
+  tk_messageBox -type ok -icon info -title $title -message $message
 }
 
 
@@ -1398,86 +1436,104 @@ global windname version
 # Function to generate the main display window
 ###############################################################################
 proc MainDisplay {base} {
-global fontfix tmpmess filename pdsconn
+  global fontfix tmpmess filename pdsconn
 
-set bg {Light Yellow}
+  set bg {Light Yellow}
+  set padx 5
+  set pady $padx
+  set statusw 15
+  set statush $statusw
 
-$base config -background $bg
-$base config -menu .mainmenu
-wm focusmodel $base passive
-wm title $base "PLC Data Server - plc.cnf Checker" 
-wm geometry $base 800x600+0+0
-wm maxsize $base 800 600
-wm minsize $base 800 600
-wm overrideredirect $base 0
-wm resizable $base 0 0
-wm deiconify $base
-menu .mainmenu -cursor {} -tearoff 0
-.mainmenu add cascade -menu .mainmenu.filemenu -label File -underline 0
-.mainmenu add cascade -menu .mainmenu.editmenu -label Edit -underline 0
-.mainmenu add cascade -menu .mainmenu.plcmenu -label PLC -underline 0
-.mainmenu add cascade -menu .mainmenu.aboutmenu -label Help -underline 0
-menu .mainmenu.filemenu -tearoff 0
-.mainmenu.filemenu add command -command {ChooseFile} -label {Open} -underline 0 -accelerator {Ctrl+O}
-.mainmenu.filemenu add command -command {ReloadFile $filename} -label {Reload} -underline 0 -accelerator {Ctrl+R}
-.mainmenu.filemenu add command -command {CloseApp} -label {Exit} -underline 1 -accelerator {Ctrl+X}
-.mainmenu.filemenu entryconfigure 1 -state disabled
-menu .mainmenu.editmenu -tearoff 0
-.mainmenu.editmenu add command -command {SearchBox} -label {Find} -underline 0 -accelerator {Ctrl+F}
-.mainmenu.editmenu entryconfigure 1 -state disabled
-menu .mainmenu.plcmenu -tearoff 0
-.mainmenu.plcmenu add command -command {ConnectPLC} -label {Connect} -underline 0 -accelerator {Ctrl+C}
-.mainmenu.plcmenu add command -command {DisconnectPLC} -label {Disconnect} -underline 0 -accelerator {Ctrl+D}
-.mainmenu.plcmenu add separator
-.mainmenu.plcmenu add command -command {OnlineBox} -label {Online}
-.mainmenu.plcmenu entryconfigure 0 -state disabled
-.mainmenu.plcmenu entryconfigure 1 -state disabled
-.mainmenu.plcmenu entryconfigure 3 -state disabled
-menu .mainmenu.aboutmenu -tearoff 0
-.mainmenu.aboutmenu add command -command {AboutBox} -label About -underline 0
+  # Configure the window
+  $base config -background $bg -padx $padx -pady $pady
+  $base config -menu .mainmenu
+  wm focusmodel $base passive
+  wm title $base "PLC Data Server - plc.cnf Checker" 
+  wm geometry $base 800x600+0+0
+  wm overrideredirect $base 0
+  wm deiconify $base
 
-frame .plcframe -borderwidth 2 -relief sunken
-label .plcframe.label1 -borderwidth 1 -text {PLCs}
-listbox .plcframe.listbox -font $fontfix -yscrollcommand ".plcframe.scroller set"
-scrollbar .plcframe.scroller -orient vertical -command ".plcframe.listbox yview"
+  # Configure the menus
+  menu .mainmenu -cursor {} -tearoff 0
+  .mainmenu add cascade -menu .mainmenu.filemenu -label File -underline 0
+  .mainmenu add cascade -menu .mainmenu.editmenu -label Edit -underline 0
+  .mainmenu add cascade -menu .mainmenu.plcmenu -label PLC -underline 0
+  .mainmenu add cascade -menu .mainmenu.aboutmenu -label Help -underline 0
+  menu .mainmenu.filemenu -tearoff 0
+  .mainmenu.filemenu add command -command {ChooseFile} -label {Open} -underline 0 -accelerator {Ctrl+O}
+  .mainmenu.filemenu add command -command {ReloadFile $filename} -label {Reload} -underline 0 -accelerator {Ctrl+R}
+  .mainmenu.filemenu add command -command {CloseApp} -label {Exit} -underline 1 -accelerator {Ctrl+X}
+  .mainmenu.filemenu entryconfigure 1 -state disabled
+  menu .mainmenu.editmenu -tearoff 0
+  .mainmenu.editmenu add command -command {SearchBox} -label {Find} -underline 0 -accelerator {Ctrl+F}
+  .mainmenu.editmenu entryconfigure 1 -state disabled
+  menu .mainmenu.plcmenu -tearoff 0
+  .mainmenu.plcmenu add command -command {ConnectPLC} -label {Connect} -underline 0 -accelerator {Ctrl+C}
+  .mainmenu.plcmenu add command -command {DisconnectPLC} -label {Disconnect} -underline 0 -accelerator {Ctrl+D}
+  .mainmenu.plcmenu add separator
+  .mainmenu.plcmenu add command -command {OnlineBox} -label {Online}
+  .mainmenu.plcmenu entryconfigure 0 -state disabled
+  .mainmenu.plcmenu entryconfigure 1 -state disabled
+  .mainmenu.plcmenu entryconfigure 3 -state disabled
+  menu .mainmenu.aboutmenu -tearoff 0
+  .mainmenu.aboutmenu add command -command {AboutBox} -label About -underline 0
 
-frame .tagframe -borderwidth 2 -relief sunken
-label .tagframe.label1 -borderwidth 1 -text {Tag Names}
-label .tagframe.label2 -borderwidth 1 -text {Status}
-listbox .tagframe.listbox -font $fontfix -yscrollcommand ".tagframe.scroller set"
-scrollbar .tagframe.scroller -orient vertical -command ".tagframe.listbox yview"
-frame .tagframe.statusframe -borderwidth 2 -relief sunken
+  # Configure the widgets for the window
+  frame .plcframe -borderwidth 2 -relief sunken
+  label .plcframe.label1 -borderwidth 1 -text {PLCs}
+  listbox .plcframe.listbox -font $fontfix -yscrollcommand ".plcframe.scroller set" -width 22 -height 10
+  scrollbar .plcframe.scroller -orient vertical -command ".plcframe.listbox yview"
 
-frame .blockframe -borderwidth 2 -relief sunken
-label .blockframe.label1 -borderwidth 1 -text {Data Blocks}
-label .blockframe.label2 -borderwidth 1 -text {Status}
-listbox .blockframe.listbox -font $fontfix -yscrollcommand ".blockframe.scroller set"
-scrollbar .blockframe.scroller -orient vertical -command ".blockframe.listbox yview"
-frame .blockframe.statusframe -borderwidth 2 -relief sunken
+  frame .tagframe -borderwidth 2 -relief sunken
+  label .tagframe.label1 -borderwidth 1 -text {Tag Names}
+  label .tagframe.label2 -borderwidth 1 -text {Status}
+  listbox .tagframe.listbox -font $fontfix -yscrollcommand ".tagframe.scroller set" -width 45 -height 10
+  scrollbar .tagframe.scroller -orient vertical -command ".tagframe.listbox yview"
+  frame .tagframe.statusframe -borderwidth 2 -relief sunken -width $statusw -height $statush
 
-place .plcframe -x 5 -y 20 -width 255 -height 195 -anchor nw -bordermode ignore
-place .plcframe.label1 -x 30 -y 10 -anchor nw -bordermode ignore
-place .plcframe.listbox -x 15 -y 35 -width 200 -height 140 -anchor nw -bordermode ignore
-place .plcframe.scroller -x 215 -y 35 -width 20 -height 140 -anchor nw
+  frame .blockframe -borderwidth 2 -relief sunken
+  label .blockframe.label1 -borderwidth 1 -text {Data Blocks}
+  label .blockframe.label2 -borderwidth 1 -text {Status}
+  listbox .blockframe.listbox -font $fontfix -yscrollcommand ".blockframe.scroller set" -width 69 -height 10
+  scrollbar .blockframe.scroller -orient vertical -command ".blockframe.listbox yview"
+  frame .blockframe.statusframe -borderwidth 2 -relief sunken -width $statusw -height $statush
 
-place .tagframe -x 280 -y 20 -width 505 -height 195 -anchor nw -bordermode ignore
-place .tagframe.label1 -x 30 -y 10 -anchor nw -bordermode ignore
-place .tagframe.label2 -x 410 -y 10 -anchor nw -bordermode ignore
-place .tagframe.listbox -x 15 -y 35 -width 450 -height 140 -anchor nw -bordermode ignore
-place .tagframe.scroller -x 465 -y 35 -width 20 -height 140 -anchor nw
-place .tagframe.statusframe -x 465 -y 10 -width 15 -height 15 -anchor nw 
+  # Layout the window
+  grid .plcframe .tagframe -sticky nsew
 
-place .blockframe -x 5 -y 235 -width 780 -height 275 -anchor nw -bordermode ignore
-place .blockframe.label1 -x 30 -y 10 -anchor nw -bordermode ignore
-place .blockframe.label2 -x 680 -y 10 -anchor nw -bordermode ignore
-place .blockframe.listbox -x 15 -y 35 -width 725 -height 220 -anchor nw -bordermode ignore
-place .blockframe.scroller -x 740 -y 35 -width 20 -height 220 -anchor nw
-place .blockframe.statusframe -x 740 -y 10 -width 15 -height 15 -anchor nw 
+  grid .plcframe.label1 -padx $padx -sticky w
+  grid .plcframe.listbox .plcframe.scroller -sticky nsew -row 1
 
-bind . <Control-O> {ChooseFile}
-bind . <Control-o> {ChooseFile}
-bind . <Control-X> {CloseApp}
-bind . <Control-x> {CloseApp}
+  grid .tagframe.label1 -padx $padx -sticky w
+  grid .tagframe.label2 -padx $padx -column 1 -row 0 -sticky e
+  grid .tagframe.statusframe -column 2 -row 0 -sticky w
+  grid .tagframe.listbox .tagframe.scroller -sticky nsew -row 1 -columnspan 2
+
+  grid .blockframe -columnspan 2 -sticky nsew
+
+  grid .blockframe.label1 -padx $padx -sticky w
+  grid .blockframe.label2 -padx $padx -column 1 -row 0 -sticky e
+  grid .blockframe.statusframe -column 2 -row 0 -sticky w
+  grid .blockframe.listbox .blockframe.scroller -sticky nsew -row 1 -columnspan 2
+
+  # Resize the widgets with the window
+  grid columnconfigure . "0 1" -weight 1
+  grid rowconfigure . "0 1" -weight 1
+
+  grid columnconfigure .plcframe 0 -weight 1
+  grid rowconfigure .plcframe 1 -weight 1
+
+  grid columnconfigure .tagframe "0 1" -weight 1
+  grid rowconfigure .tagframe 1 -weight 1
+
+  grid columnconfigure .blockframe "0 1" -weight 1
+  grid rowconfigure .blockframe 1 -weight 1
+
+  # Menu key bindings
+  bind . <Control-O> {ChooseFile}
+  bind . <Control-o> {ChooseFile}
+  bind . <Control-X> {CloseApp}
+  bind . <Control-x> {CloseApp}
 }
 
 
@@ -1485,7 +1541,7 @@ bind . <Control-x> {CloseApp}
 ###############################################################################
 # Main Program
 ###############################################################################
-set version {Version 1.5}
+set pds_version {2.1.0}
 set pds_dir {/usr/local/pds}
 set filename {}
 set tab \012
@@ -1508,14 +1564,13 @@ set pds_lib_dir $pds_dir/lib
 source $pds_lib_dir/libtcl.tcl
 
 if {$argc != 0} {
-   puts "Error! Wrong number of arguments supplied!\n"
-   puts "Usage: chkcnf.tcl"
-   exit
+  puts "Error! Wrong number of arguments supplied!\n"
+  puts "Usage: chkcnf.tcl"
+  exit
 }
 
 load $pds_lib_dir/libpds_tcl.so
  
 MainDisplay .
-nomin .
 ChooseFile
 
