@@ -1541,8 +1541,8 @@ proc MainDisplay {base} {
 ###############################################################################
 # Main Program
 ###############################################################################
-set pds_version {2.1.0}
-set pds_dir {/usr/local/pds}
+set pds_version {@PDS_VERSION@}
+set pds_dir {@prefix@}
 set filename {}
 set tab \012
 set BREADMAX 100

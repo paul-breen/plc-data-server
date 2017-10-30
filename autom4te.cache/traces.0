@@ -487,6 +487,9 @@ m4trace:configure.in:397: -1- m4_pattern_allow([^TCL_CONFIG_DEFS_FILE$])
 m4trace:configure.in:405: -1- AC_CONFIG_FILES([Makefile.defs
 	Makefile.tcldefs
 	control_scripts/pds
+	tcl_utils/chkcnf.tcl
+	tcl_utils/tcl_spi_test.tcl
+	tcl_utils/tcl_test.tcl
 ])
 m4trace:configure.in:405: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
 You should run autoupdate.], [])

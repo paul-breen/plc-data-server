@@ -1,11 +1,14 @@
 #!/usr/bin/tclsh
 
+set pds_dir {@prefix@}
+set pds_lib_dir $pds_dir/lib
+
 if {$argc != 1} {
   puts "Usage: $argv0 tagname"
   exit
 }
 
-load /usr/local/pds/lib/libpds_spi_tcl.so
+load $pds_lib_dir/libpds_spi_tcl.so
 
 set PDS_SPI_IPCKEY 1423780
 

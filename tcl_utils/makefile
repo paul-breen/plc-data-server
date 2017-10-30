@@ -36,6 +36,7 @@ INST_DIR = $(PDS_BIN_DIR)
 
 # Install software:
 install: 
+	chmod 755 $(TARGET)
 	mkdir -m755 -p $(INST_DIR) > /dev/null 2>&1
 	cp $(TARGET) $(INST_DIR)
 

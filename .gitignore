@@ -15,6 +15,9 @@ control_scripts/pds
 include/pds_config.h
 nwstub/pds_nwstubd
 server/pdsd
+tcl_utils/chkcnf.tcl
+tcl_utils/tcl_spi_test.tcl
+tcl_utils/tcl_test.tcl
 utils/addrmm/addrmm
 utils/cnf-read/cnf-read
 utils/force_tag_status/force_tag_status

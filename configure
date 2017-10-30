@@ -4986,7 +4986,7 @@ $as_echo "reading definitions from $TCL_CONFIG_SH" >&6; }
 fi
 
 
-ac_config_files="$ac_config_files Makefile.defs Makefile.tcldefs control_scripts/pds"
+ac_config_files="$ac_config_files Makefile.defs Makefile.tcldefs control_scripts/pds tcl_utils/chkcnf.tcl tcl_utils/tcl_spi_test.tcl tcl_utils/tcl_test.tcl"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -5682,6 +5682,9 @@ do
     "Makefile.defs") CONFIG_FILES="$CONFIG_FILES Makefile.defs" ;;
     "Makefile.tcldefs") CONFIG_FILES="$CONFIG_FILES Makefile.tcldefs" ;;
     "control_scripts/pds") CONFIG_FILES="$CONFIG_FILES control_scripts/pds" ;;
+    "tcl_utils/chkcnf.tcl") CONFIG_FILES="$CONFIG_FILES tcl_utils/chkcnf.tcl" ;;
+    "tcl_utils/tcl_spi_test.tcl") CONFIG_FILES="$CONFIG_FILES tcl_utils/tcl_spi_test.tcl" ;;
+    "tcl_utils/tcl_test.tcl") CONFIG_FILES="$CONFIG_FILES tcl_utils/tcl_test.tcl" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
