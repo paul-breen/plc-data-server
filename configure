@@ -2252,7 +2252,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-CFLAGS="-D_SVID_SOURCE -O2"
+CFLAGS="-D_SVID_SOURCE -O2 -fPIC"
 
 LDFLAGS="-Wall"
 

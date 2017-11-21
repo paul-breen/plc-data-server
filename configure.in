@@ -32,7 +32,7 @@ dnl Set the 'C' preprocessor symbol PDS_VERSION
 AC_DEFINE_UNQUOTED(PDS_VERSION, "$PDS_VERSION")
 
 dnl Initialise CFLAGS
-CFLAGS="-D_SVID_SOURCE -O2"
+CFLAGS="-D_SVID_SOURCE -O2 -fPIC"
 
 dnl Initialise LDFLAGS
 LDFLAGS="-Wall"
