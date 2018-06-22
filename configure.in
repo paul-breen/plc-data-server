@@ -41,7 +41,7 @@ dnl ********** GET CONFIGURE COMMAND LINE OPTIONS **********
 
 dnl Set header file directories
 AC_ARG_WITH(includes,
-[  --with-includes=DIR     site header files for tk/tcl, etc in DIR],
+[  --with-includes=DIR     site header files for tk/tcl, python etc in DIR],
 [
 case "$withval" in
   "" | y | ye | yes | n | no)
@@ -137,6 +137,23 @@ TCL_DIRS="$withval"
 ]
 )
 
+dnl We exclude python support unless user says --with-python
+AC_MSG_CHECKING(setting USE_PYTHON)
+AC_ARG_WITH(python,
+[  --with-python           build Python interfaces (remember to set path to Python headers with --with-includes)],
+[
+case "$withval" in
+  y | ye | yes)
+  USE_PYTHON=true; AC_MSG_RESULT(enabled) ;;
+  *)
+  USE_PYTHON=; AC_MSG_RESULT(disabled) ;;
+esac
+],
+[ USE_PYTHON=; AC_MSG_RESULT(disabled) ]
+)
+
+AC_SUBST(USE_PYTHON)
+
 dnl We exclude nwstub support unless user says --with-nwstub
 AC_MSG_CHECKING(setting USE_NWSTUB)
 AC_ARG_WITH(nwstub,
@@ -197,6 +214,7 @@ AC_PATH_PROG(IPCRM, ipcrm)
 AC_PATH_PROG(TAR, tar)
 AC_PATH_PROGS(GZCAT, gzcat zcat gzip, gzcat)
 AC_PATH_PROGS(TCLSH, tclsh tcl)
+AC_PATH_PROGS(SWIG, swig)
 
 dnl Figure out how to invoke "install" and what install options to use.
 AC_PROG_INSTALL
@@ -396,6 +414,22 @@ then
     AC_MSG_RESULT(reading definitions from $TCL_CONFIG_SH)
     AC_SUBST_FILE(TCL_CONFIG_DEFS_FILE) 
     TCL_CONFIG_DEFS_FILE=$TCL_CONFIG_LOCAL
+  fi
+fi
+
+dnl Find the swig program.  We use swig to build the Python interface
+if test "$USE_PYTHON" = true
+then
+  AC_MSG_CHECKING(for swig)
+
+  dnl If swig is not found, then disable Python support
+  if test -z "$SWIG"
+  then
+    AC_MSG_RESULT(no)
+    AC_MSG_WARN(PYTHON support disabled; swig program is missing)
+    USE_PYTHON=
+  else
+    AC_MSG_RESULT($SWIG)
   fi
 fi
 

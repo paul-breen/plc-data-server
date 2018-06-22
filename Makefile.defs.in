@@ -97,6 +97,7 @@ PDS_CONF_LIB_DIRS= @PDS_CONF_LIB_DIRS@
 # Please do not edit any of the USE_* macros by hand
 USE_TCL= @USE_TCL@
 USE_CURSES= @USE_CURSES@
+USE_PYTHON= @USE_PYTHON@
 
 #******************************************************************************
 # INSTALLATION
@@ -145,6 +146,7 @@ IPCRM= @IPCRM@
 TAR= @TAR@
 GZCAT= @GZCAT@
 TCLSH= @TCLSH@
+SWIG= @SWIG@
 
 # Compiler/linker flags etc.
 CFLAGS= @CFLAGS@
