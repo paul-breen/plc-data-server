@@ -33,6 +33,30 @@
 ******************************************************************************/
 
 /******************************************************************************
+* Internal function to get a string of tags' value (formatted)                *
+*                                                                             *
+* Pre-condition:  A valid server connection, the tagname (base), the number   *
+*                 of tagvalues to read, a string for storage of the tags'     *
+*                 value and a data format specifier are passed to the         *
+*                 function.  The semaphore should be held before calling      *
+* Post-condition: The tagnames are accessed in the shared memory segment and  *
+*                 their value's as a string are returned formatted as the     *
+*                 specified type.  On error a -1 is returned                  *
+******************************************************************************/
+/* static int _get_strtagf(pdsconn *conn, const char *tagname, int ntags,
+                        char *tagvalue, const char fmt); */
+
+/******************************************************************************
+* Internal function to set the value of a semaphore                           *
+*                                                                             *
+* Pre-condition:  A valid semaphore ID, the value for the operation and the   *
+*                 semaphore set array number are passed to the function       *
+* Post-condition: The semaphore is set with the passed value.  If an error    *
+*                 occurs a -1 is returned                                     *
+******************************************************************************/
+/* static int _semset(int id, int op, int snum); */
+
+/******************************************************************************
 * Function to connect a client to the server                                  *
 *                                                                             *
 * Pre-condition:  A server connection key is passed to the function.  If the  *
@@ -56,20 +80,6 @@ pdsconn* PDSconnect(key_t connkey);
 *                 error occurs a -1 is returned                               *
 ******************************************************************************/
 int PDSdisconnect(pdsconn *conn);
-
-/******************************************************************************
-* Internal function to get a string of tags' value (formatted)                *
-*                                                                             *
-* Pre-condition:  A valid server connection, the tagname (base), the number   *
-*                 of tagvalues to read, a string for storage of the tags'     *
-*                 value and a data format specifier are passed to the         *
-*                 function.  The semaphore should be held before calling      *
-* Post-condition: The tagnames are accessed in the shared memory segment and  *
-*                 their value's as a string are returned formatted as the     *
-*                 specified type.  On error a -1 is returned                  *
-******************************************************************************/
-static int _get_strtagf(pdsconn *conn, const char *tagname, int ntags,
-                        char *tagvalue, const char fmt);
 
 /******************************************************************************
 * Function to get a tag's value                                               *
@@ -194,16 +204,6 @@ int PDSset_wordbit_state(pdsconn *conn, char *tagname,
 ******************************************************************************/
 int PDSget_tag_status(pdsconn *conn, const char *tagname,
                       unsigned short int *status);
-
-/******************************************************************************
-* Internal function to set the value of a semaphore                           *
-*                                                                             *
-* Pre-condition:  A valid semaphore ID, the value for the operation and the   *
-*                 semaphore set array number are passed to the function       *
-* Post-condition: The semaphore is set with the passed value.  If an error    *
-*                 occurs a -1 is returned                                     *
-******************************************************************************/
-static int _semset(int id, int op, int snum);
 
 /******************************************************************************
 * Function to print a complete memory map of data tags in shared memory       *

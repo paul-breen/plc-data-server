@@ -9,6 +9,97 @@
 #include "pds_api.h" 
 
 /******************************************************************************
+* Internal function to get a string of tags' value (formatted)                *
+*                                                                             *
+* Pre-condition:  A valid server connection, the tagname (base), the number   *
+*                 of tagvalues to read, a string for storage of the tags'     *
+*                 value and a data format specifier are passed to the         *
+*                 function.  The semaphore should be held before calling      *
+* Post-condition: The tagnames are accessed in the shared memory segment and  *
+*                 their value's as a string are returned formatted as the     *
+*                 specified type.  On error a -1 is returned                  *
+******************************************************************************/
+static int _get_strtagf(pdsconn *conn, const char *tagname, int ntags,
+                        char *tagvalue, const char fmt)
+{
+  pdstag *tag = NULL;
+  int len = strlen(tagname), retval = -1, i = 0, j = 0;
+
+  if(tagvalue) tagvalue[0] = '\0';
+
+  /* Search for tagname ensuring string is not just a substring of tag */
+  for(tag = conn->data, i = 0; tag && i < conn->ttags; tag++, i++)
+  {
+    if(memcmp(tag->name, tagname, len) == 0)
+    {
+      if(len == strlen(tag->name)) 
+      {
+        /* Build the string of tags and set the query status */
+        switch(fmt)
+        {
+          case 'd' :
+          case 'i' :
+          default  :                   /* Default - format as an integer */
+            for(j = 0; j < ntags && tag && i < conn->ttags; tag++, i++, j++)
+            {
+              sprintf(tagvalue, "%s%u", tagvalue, tag->value);
+              conn->plc_status |= tag->status;
+            }
+          break;
+
+          case 'f' :                   /* Format as a float */
+            for(j = 0; j < ntags && tag && i < conn->ttags; tag++, i++, j++)
+            {
+              sprintf(tagvalue, "%s%f", tagvalue, (float) tag->value);
+              conn->plc_status |= tag->status;
+            }
+          break;
+
+          case 'c' :                   /* Format as a char */
+          case 's' :
+            for(j = 0; j < ntags && tag && i < conn->ttags; tag++, i++, j++)
+            {
+              sprintf(tagvalue, "%s%c%c", tagvalue,
+              isprint((tag->value >> 8)) ? (char) (tag->value >> 8) : ' ',
+              isprint((tag->value & 0xff)) ? (char) (tag->value & 0xff) : ' ');
+              conn->plc_status |= tag->status;
+            }
+          break;
+        }
+        retval = 0;
+        break;
+
+      }
+    }
+  }
+
+  return retval;
+}
+
+
+
+/******************************************************************************
+* Internal function to set the value of a semaphore                           *
+*                                                                             *
+* Pre-condition:  A valid semaphore ID, the value for the operation and the   *
+*                 semaphore set array number are passed to the function       *
+* Post-condition: The semaphore is set with the passed value.  If an error    *
+*                 occurs a -1 is returned                                     *
+******************************************************************************/
+static int _semset(int id, int op, int snum)
+{
+  struct sembuf sb;
+
+  sb.sem_num = snum;              /* Set semaphore No. in this semaphore set */
+  sb.sem_op = op;                 /* Set the value for this operation */
+  sb.sem_flg = SEM_UNDO;          /* Ensure 'rollback' if an error occurs */
+
+  return semop(id, &sb, 1);
+}
+
+
+
+/******************************************************************************
 * Function to connect a client to the server                                  *
 *                                                                             *
 * Pre-condition:  A server connection key is passed to the function.  If the  *
@@ -178,76 +269,6 @@ int PDSdisconnect(pdsconn *conn)
       return 0;
     }
   }
-}
-
-
-
-/******************************************************************************
-* Internal function to get a string of tags' value (formatted)                *
-*                                                                             *
-* Pre-condition:  A valid server connection, the tagname (base), the number   *
-*                 of tagvalues to read, a string for storage of the tags'     *
-*                 value and a data format specifier are passed to the         *
-*                 function.  The semaphore should be held before calling      *
-* Post-condition: The tagnames are accessed in the shared memory segment and  *
-*                 their value's as a string are returned formatted as the     *
-*                 specified type.  On error a -1 is returned                  *
-******************************************************************************/
-static int _get_strtagf(pdsconn *conn, const char *tagname, int ntags,
-                        char *tagvalue, const char fmt)
-{
-  pdstag *tag = NULL;
-  int len = strlen(tagname), retval = -1, i = 0, j = 0;
-
-  if(tagvalue) tagvalue[0] = '\0';
-
-  /* Search for tagname ensuring string is not just a substring of tag */
-  for(tag = conn->data, i = 0; tag && i < conn->ttags; tag++, i++)
-  {
-    if(memcmp(tag->name, tagname, len) == 0)
-    {
-      if(len == strlen(tag->name)) 
-      {
-        /* Build the string of tags and set the query status */
-        switch(fmt)
-        {
-          case 'd' :
-          case 'i' :
-          default  :                   /* Default - format as an integer */
-            for(j = 0; j < ntags && tag && i < conn->ttags; tag++, i++, j++)
-            {
-              sprintf(tagvalue, "%s%u", tagvalue, tag->value);
-              conn->plc_status |= tag->status;
-            }
-          break;
-
-          case 'f' :                   /* Format as a float */
-            for(j = 0; j < ntags && tag && i < conn->ttags; tag++, i++, j++)
-            {
-              sprintf(tagvalue, "%s%f", tagvalue, (float) tag->value);
-              conn->plc_status |= tag->status;
-            }
-          break;
-
-          case 'c' :                   /* Format as a char */
-          case 's' :
-            for(j = 0; j < ntags && tag && i < conn->ttags; tag++, i++, j++)
-            {
-              sprintf(tagvalue, "%s%c%c", tagvalue,
-              isprint((tag->value >> 8)) ? (char) (tag->value >> 8) : ' ',
-              isprint((tag->value & 0xff)) ? (char) (tag->value & 0xff) : ' ');
-              conn->plc_status |= tag->status;
-            }
-          break;
-        }
-        retval = 0;
-        break;
-
-      }
-    }
-  }
-
-  return retval;
 }
 
 
@@ -666,27 +687,6 @@ int PDSget_tag_status(pdsconn *conn, const char *tagname,
   }
 
   return retval;
-}
-
-
-
-/******************************************************************************
-* Internal function to set the value of a semaphore                           *
-*                                                                             *
-* Pre-condition:  A valid semaphore ID, the value for the operation and the   *
-*                 semaphore set array number are passed to the function       *
-* Post-condition: The semaphore is set with the passed value.  If an error    *
-*                 occurs a -1 is returned                                     *
-******************************************************************************/
-static int _semset(int id, int op, int snum)
-{
-  struct sembuf sb;
-
-  sb.sem_num = snum;              /* Set semaphore No. in this semaphore set */
-  sb.sem_op = op;                 /* Set the value for this operation */
-  sb.sem_flg = SEM_UNDO;          /* Ensure 'rollback' if an error occurs */
-
-  return semop(id, &sb, 1);
 }
 
 
