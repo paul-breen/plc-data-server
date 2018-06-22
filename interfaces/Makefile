@@ -23,6 +23,10 @@ ifeq ($(USE_TCL), true)
 	${MAKE} -C libpds_spi_tcl
 endif
 
+ifeq ($(USE_PYTHON), true)
+	${MAKE} -C pdspy
+endif
+
 # Tidy the directories:
 clean: 
 	${MAKE} -C libpds clean
@@ -34,6 +38,10 @@ ifeq ($(USE_TCL), true)
 	${MAKE} -C libpds_spi_tcl clean
 endif
 
+ifeq ($(USE_PYTHON), true)
+	${MAKE} -C pdspy clean
+endif
+
 # Install software:
 install: 
 	${MAKE} -C libpds install
@@ -43,5 +51,9 @@ install:
 ifeq ($(USE_TCL), true)
 	${MAKE} -C libpds_tcl install
 	${MAKE} -C libpds_spi_tcl install
+endif
+
+ifeq ($(USE_PYTHON), true)
+	${MAKE} -C pdspy install
 endif
 
