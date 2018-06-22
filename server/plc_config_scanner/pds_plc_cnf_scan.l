@@ -263,7 +263,7 @@ tag_id ^[\t ]{1}
   /*        has been read in and it's counter incremented.  */
 
   /* The tag name state.  Define a tag name token */
-<tagname_state>[a-zA-Z0-9_:\[\]]{1,64} { 
+<tagname_state>[a-zA-Z0-9_:\.\[\]]{1,64} { 
 
   if((i - 1) < 0)                 /* Ensure a block header has been read */
   {
