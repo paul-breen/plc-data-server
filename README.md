@@ -42,7 +42,7 @@ make install
 
 See `./configure --help` for available options.
 
-To also build the Tcl/Tk interface libraries and utilities, type:
+To build the Tcl/Tk interface libraries and utilities, type:
 
 ```
 ./configure --with-tcl --with-tclconfig=/usr/lib
@@ -51,6 +51,14 @@ make install
 ```
 
 ensuring the correct path for your `tclConfig.sh` script.
+
+To build the Python interface libraries and utilities, type:
+
+```
+./configure --with-python --with-includes=/usr/include/python
+```
+
+ensuring the correct path for your python development header files.
 
 In addition, the PDS can be network enabled by building the PDS network stub:
 
