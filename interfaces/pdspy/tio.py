@@ -14,19 +14,32 @@ import pds
 def get_printable_or_space(char):
     return (char if 31 < char < 127 else 32)
  
-def set_tag(args, tag):
-    tag.value = args.set
-    tag.mtime = round(datetime.datetime.timestamp(datetime.datetime.now()))
+def set_tag(conn, args):
+    retval = pds.PDSset_tag(conn, args.tagname, [args.set])
 
-def get_tag(args, tag):
-    if args.char:
-        hi = get_printable_or_space(tag.value >> 8)
-        lo = get_printable_or_space(tag.value & 0xff)
-        print("{:c}{:c}".format(hi, lo))
-    elif args.float:
-        print("{:f}".format(tag.value))
+    if retval == -1:
+        print("Failed to set tag {} value".format(args.tagname))
+
+    return retval
+
+def get_tag(conn, args):
+    retval, tagvalue = pds.PDSget_tag(conn, args.tagname)
+
+    if retval == -1:
+        print("Failed to get tag {} value".format(args.tagname))
     else:
-        print("{:d}".format(tag.value))
+        tagvalue = int(tagvalue)
+
+        if args.char:
+            hi = get_printable_or_space(tagvalue >> 8)
+            lo = get_printable_or_space(tagvalue & 0xff)
+            print("{:c}{:c}".format(hi, lo))
+        elif args.float:
+            print("{:f}".format(tagvalue))
+        else:
+            print("{:d}".format(tagvalue))
+
+    return retval
 
 def process_tag(args):
     conn = pds.PDSconnect(pds.PDS_IPCKEY)
@@ -34,17 +47,14 @@ def process_tag(args):
     if conn.conn_status != pds.PDS_CONN_OK:
         raise ValueError("Error connecting to the PDS: {}".format(conn.status))
 
-    tag = pds.PDSget_tag_object(conn, args.tagname)
-
-    if tag is None:
-        raise ValueError("{}: No such tagname".format(args.tagname))
-
     if args.set:
-        set_tag(args, tag)
+        retval = set_tag(conn, args)
     else:
-        get_tag(args, tag)
+        retval = get_tag(conn, args)
 
     pds.PDSdisconnect(conn)
+
+    return retval
 
 def parse_tio_cmdln():
     parser = argparse.ArgumentParser(description="get or set the value of the given tag")
@@ -65,5 +75,7 @@ def parse_tio_cmdln():
 
 if __name__ == '__main__':
     args = parse_tio_cmdln()
-    process_tag(args)
+    retval = process_tag(args)
+
+    exit(retval)
 
