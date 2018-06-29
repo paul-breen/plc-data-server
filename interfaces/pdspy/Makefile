@@ -32,7 +32,7 @@ include $(SRCDIR)/Makefile.defs
 MODULE_DIST_DIR = pdspy
 
 # Library files needed to build libraries (dynamic):
-LIBS += -lc $(PDS_BUILD_LIBPDS_SO)
+LIBS += -lc $(PDS_BUILD_LIBPDS_A)
 
 # Swig source interface file needed to build libraries (dynamic):
 SRC = pds.i
