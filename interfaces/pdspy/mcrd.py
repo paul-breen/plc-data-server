@@ -11,7 +11,9 @@ import sys
 from os import path
 import time
 
-import pds
+# N.B.: This is to import the installed module.  To import during development,
+#       symlink ./build/pds as pds, and then this will work for the local copy
+import pds.pds as pds
 
 def process_tags(tagnames):
     conn = pds.PDSconnect(pds.PDS_IPCKEY)

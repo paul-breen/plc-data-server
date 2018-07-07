@@ -9,7 +9,9 @@
 import argparse
 import datetime
 
-import pds
+# N.B.: This is to import the installed module.  To import during development,
+#       symlink ./build/pds as pds, and then this will work for the local copy
+import pds.pds as pds
 
 def get_printable_or_space(char):
     return (char if 31 < char < 127 else 32)

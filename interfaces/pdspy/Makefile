@@ -28,8 +28,9 @@ include $(SRCDIR)/Makefile.defs
 
 ############################### CONFIGURE BLOCK ############################### 
 
-# Path to the install lib directory (dynamic):
-MODULE_DIST_DIR = pdspy
+# Path to the install dist build directories (dynamic):
+MODULE_DIST_DIR_ROOT = build
+MODULE_DIST_DIR = $(MODULE_DIST_DIR_ROOT)/pds
 
 # Library files needed to build libraries (dynamic):
 LIBS += -lc $(PDS_BUILD_LIBPDS_A)
@@ -49,6 +50,7 @@ OBJS = pds_wrap.o
 MODULE = pds.py
 LIBSO = _pds.so
 MODULE_INIT = __init__.py
+MODULE_BUILDER = setup.py
 
 # Include paths for headers:
 
@@ -61,23 +63,26 @@ DEPS = $(SRC)
 
 # default target (all) - build everything:
 all: $(MODULE)
+	${MAKE} copy_module
 
 # Tidy directory:
 clean: 
 	rm -f $(MODULE) $(LIBSO) $(GEN_SRCS) $(OBJS)
-	rm -rf $(MODULE_DIST_DIR)
+	rm -rf $(MODULE_DIST_DIR_ROOT)
 	rm -rf __pycache__
 
 # Install software:
 install: 
-	${MAKE} copy_module
+	# N.B.: This must be semicolon-separated to run in a single shell
+	cd $(MODULE_DIST_DIR_ROOT); pip install --upgrade .
 
 # The module (copy):
 copy_module:
 	mkdir -m755 -p $(MODULE_DIST_DIR) > /dev/null 2>&1
 	cp $(LIBSO) $(MODULE_DIST_DIR)
 	cp $(MODULE) $(MODULE_DIST_DIR)
-	touch $(MODULE_DIST_DIR)/$(MODULE_INIT)
+	cp $(MODULE_INIT) $(MODULE_DIST_DIR)
+	cp $(MODULE_BUILDER) $(MODULE_DIST_DIR_ROOT)
 
 # Build instructions (module):
 $(MODULE) : $(LIBSO)
