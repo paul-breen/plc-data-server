@@ -31,7 +31,7 @@ int mb_setup_read_query(unsigned char *query, plc_cnf_block *block)
   unsigned short int unit = 0, function = 0, ref = 0, nrefs = 0;
   short int qlen = 0;
  
-  unit = block->path[0];
+  unit = atoi(block->path);
   function = MB_GET_FUNC(block->function);
   function = MB_WRRD_MAP(function); 
   ref = MB_LO_REF(block->base_addr, block->tags[0].ref);
@@ -64,7 +64,7 @@ int mb_setup_write_query(unsigned char *query, pdstag *tag, pdsmsg *msg)
   short int qlen = 0;
  
   function = MB_GET_FUNC(tag->function);
-  unit = tag->path[0];
+  unit = atoi(tag->path);
   ref = MB_LO_REF(tag->base_addr, tag->ref);
 
   /* Construct the PLC query to write to this tag(s) */
@@ -92,7 +92,7 @@ int mb_setup_status_query(unsigned char *query, pdsconn *conn)
   short int qlen = 0;
  
   /* Construct the PLC query to get the status of this PLC */
-  if((qlen = mb_construct_status_plc_query(query, conn->path[0], MB_SID_STAT)) == -1)
+  if((qlen = mb_construct_status_plc_query(query, atoi(conn->path), MB_SID_STAT)) == -1)
   {
     err(errout, "%s: error constructing status query\n", PROGNAME);
   }
