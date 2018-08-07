@@ -123,8 +123,8 @@ python3 pds-scope.py -o 1000 -f 1000 -y -1.1 1.1 -i 40 sine -G -s dark_backgroun
 
     parser.add_argument('-p', '--npoints', help='number of points N to display', metavar='N', type=int, default=80)
     parser.add_argument('-y', '--ylim', help='limits of the y-axis MIN MAX', metavar='N', type=float, nargs=2)
-    parser.add_argument('-o', '--offset', help='offset N to subtract from a displaced signal', metavar='N', type=int, default=0)
-    parser.add_argument('-f', '--scale-factor', help='factor N to divide a scaled signal by', metavar='N', type=int, default=1)
+    parser.add_argument('-o', '--offset', help='offset N to subtract from a displaced signal', metavar='N', type=float, default=0)
+    parser.add_argument('-f', '--scale-factor', help='factor N to divide a scaled signal by', metavar='N', type=float, default=1)
     parser.add_argument('-i', '--interval', help='interval N in ms between samples being taken of the signal', metavar='N', type=int, default=200)
     parser.add_argument('-s', '--style', help='stylesheet STYLE to apply to the plotting area, see the matplotlib stylesheets documentation for options', metavar='STYLE', type=str)
 
