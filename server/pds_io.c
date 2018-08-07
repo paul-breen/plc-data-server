@@ -387,7 +387,15 @@ int execute_read_queries(pdsconn *conn, pds_spi_conn *spi_conn,
         reset_tags_status(conn, trans.status, trans.errx);
 
         if(*trans.status > 0)
+        {
+          /* It's crucial that we release here, otherwise the `continue`
+             will allow us to hold the semaphore again, and then we'll
+             block ourselves forever */
+          if(PDS_GET_RM_REFRESH(runmode) == PDS_RM_REFRESH_BLOCK)
+            semset(conn->semid, PDS_SEMREL, 0);
+
           continue;
+        }
       }
 
       /* Connect the server to the PLC */
