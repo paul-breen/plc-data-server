@@ -1,7 +1,14 @@
+### 2.1.2 ###
+- Various bugfixes and enhancements.  In particular the Unit ID as text bug
+  (#15), and the block refresh mode hanging bug (#17).
+### 2.1.1 ###
+- Added a new Python utility - pds-scopy.py.  This is an oscilloscope for
+  plotting a tag in realtime.
 ### 2.1.0 ###
 - Modified configure.in to include variables for enabling the PDS network
   stub.  Based on these variables, the PDS control script will start/stop
   the network stub as well as the PDS.
+- Python bindings to PDS API
 ### 2.0.0 ###
 - Rolled the new PDS Network Protocol (PDSNP) APIs, the PDSNP network stub,
   and the PDSNP utility client nwtio from the experimental src tree into the
