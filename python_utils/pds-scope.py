@@ -74,7 +74,7 @@ class PdsScope(object):
                 self.data['x'].append(i)
                 i += 1
 
-                y = (int(self.tag.value) - self.conf['offset']) / self.conf['scale_factor']
+                y = int(self.tag.value) * self.conf['scale_factor'] + self.conf['offset']
                 self.data['y'].append(y)
 
                 # Once we've drawn to the RHS, we start scrolling
@@ -98,24 +98,24 @@ class PdsScope(object):
 def parse_cmdln():
     epilog = """Examples
 
-Say we have a sine wave (in a tag called 'sine'), scaled by 1000 to make the
-samples integer, and offset by 1000, to make all samples non-negative.
+Say we have a sine wave (in a tag called 'sine'), offset by 1, to make all
+samples non-negative, and scaled by 1000 to make the samples integer.
 Passing the offset (-o) and scale-factor (-f) options normalises the sine
 wave to [-1,1].  We set fixed y-axis limits (-y), as autoscaling the y-axis
 incurs overhead so it's best to avoid it if we know the function domain in
 advance, as we do here:
 
-python3 pds-scope.py -o 1000 -f 1000 -y -1.1 1.1 sine
+python3 pds-scope.py -o -1 -f 0.001 -y -1.1 1.1 sine
 
 The same, but with a higher sampling rate by setting a smaller interval
 between samples (-i):
 
-python3 pds-scope.py -o 1000 -f 1000 -y -1.1 1.1 -i 40 sine
+python3 pds-scope.py -o -1 -f 0.001 -y -1.1 1.1 -i 40 sine
 
 Turn the grid off (-G) and set the style (-s) to a light signal on a dark
 background:
 
-python3 pds-scope.py -o 1000 -f 1000 -y -1.1 1.1 -i 40 sine -G -s dark_background
+python3 pds-scope.py -o -1 -f 0.001 -y -1.1 1.1 -i 40 sine -G -s dark_background
 """
 
     parser = argparse.ArgumentParser(description='oscilloscope to display the given tag', epilog=epilog, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -123,8 +123,8 @@ python3 pds-scope.py -o 1000 -f 1000 -y -1.1 1.1 -i 40 sine -G -s dark_backgroun
 
     parser.add_argument('-p', '--npoints', help='number of points N to display', metavar='N', type=int, default=80)
     parser.add_argument('-y', '--ylim', help='limits of the y-axis MIN MAX', metavar='N', type=float, nargs=2)
-    parser.add_argument('-o', '--offset', help='offset N to subtract from a displaced signal', metavar='N', type=float, default=0)
-    parser.add_argument('-f', '--scale-factor', help='factor N to divide a scaled signal by', metavar='N', type=float, default=1)
+    parser.add_argument('-o', '--offset', help='offset N to add to a displaced signal', metavar='N', type=float, default=0)
+    parser.add_argument('-f', '--scale-factor', help='factor N to multiply a scaled signal by', metavar='N', type=float, default=1)
     parser.add_argument('-i', '--interval', help='interval N in ms between samples being taken of the signal', metavar='N', type=int, default=200)
     parser.add_argument('-s', '--style', help='stylesheet STYLE to apply to the plotting area, see the matplotlib stylesheets documentation for options', metavar='STYLE', type=str)
 
