@@ -20,7 +20,6 @@ int main(int argc, char *argv[])
 {
   pdsconn *conn = NULL;
   pdstag *p = NULL;
-  char tmstamp[TMSTAMP_LEN] = "\0";
   char tagname[PDS_TAGNAME_LEN] = "\0";
   unsigned short int prev_val = 0;
 
@@ -51,18 +50,18 @@ int main(int argc, char *argv[])
        well as data tags */
     if((p = PDSget_tag_object(conn, tagname)))
     {
+      print_tag(p, prev_val);
+      prev_val = p->value;
+
       while(!quit_flag)
       {
         /* If the tagvalue has changed, print the data */
         if(p->value != prev_val)
         {
-          /* Construct the date/time stamp */
-          strftime(tmstamp, TMSTAMP_LEN, TMSTAMP_FMT, localtime(&p->mtime));
-
-          printf("%-19s|%-40s|%9u|%9u\n", tmstamp, tagname, p->value, prev_val);
-
+          print_tag(p, prev_val);
           prev_val = p->value;
         }
+        usleep(CHECK_PAUSE);
       }
     }
     else
@@ -81,7 +80,7 @@ int main(int argc, char *argv[])
 
   return 0;
 }
-
+ 
 
 
 /******************************************************************************
@@ -109,5 +108,27 @@ void set_quit()
 {
   quit_flag = 1;
   install_signal_handler();
+}
+
+
+
+/******************************************************************************
+* Function to print the tag's properties                                      *
+*                                                                             *
+* Pre-condition:  The tag struct to be printed & the tag's previous value are *
+*                 passed to the function.                                     *
+* Post-condition: The tag's mod. time, name and current and previous values   *
+*                 are printed out                                             *
+******************************************************************************/
+int print_tag(pdstag *tag, unsigned short int prev_val)
+{
+  char tmstamp[TMSTAMP_LEN] = "\0";
+
+  /* Construct the date/time stamp */
+  strftime(tmstamp, TMSTAMP_LEN, TMSTAMP_FMT, localtime(&tag->mtime));
+
+  printf("%-19s|%-40s|%9u|%9u\n", tmstamp, tag->name, tag->value, prev_val);
+
+  return 0;
 }
 
