@@ -53,6 +53,7 @@ install:
 	${MAKE} -C control_scripts install
 	${MAKE} -C example_plc_config install
 	${MAKE} -C tcl_utils install
+	${MAKE} -C python_utils install
 	${MAKE} -C doc install
 
 	${MAKE} print_success_message
