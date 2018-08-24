@@ -71,7 +71,7 @@ typedef struct plc_cnf_block_rec
   char tty_dev[PLC_CNF_TTY_DEV_LEN];        /* TTY device (string) */
   unsigned int base_addr;                   /* Block's base address */
   char ascii_addr[PLC_CNF_PLC_ADDR_LEN];    /* Block's logical address */
-  int pollrate;                             /* Block's poll rate (in msecs) */
+  int pollrate;                             /* Block's poll rate (in usecs) */
   unsigned short int ntags;                 /* No. of tags in this block */
 
   /******************* The tags configured for this block ********************/

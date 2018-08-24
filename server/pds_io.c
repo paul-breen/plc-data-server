@@ -178,6 +178,7 @@ pdsqueries* setup_read_queries(plc_cnf *conf, pdsconn *conn)
     queries->queries[i].port = conf->blocks[b].port;
     strcpy(queries->queries[i].tty_dev, conf->blocks[b].tty_dev);
     strcpy(queries->queries[i].path, conf->blocks[b].path);
+    queries->queries[i].pollrate = conf->blocks[b].pollrate;
 
     /* Assign a pointer to this query's PLC status word */
     for(j = 0, tag = conn->status; j < conn->nstatus_tags; j++, tag++)
@@ -356,6 +357,7 @@ int execute_read_queries(pdsconn *conn, pds_spi_conn *spi_conn,
       trans.protocol = queries->queries[i].protocol;
       trans.block_id = queries->queries[i].block_id;
       trans.block_start = PDS_GET_BLOCK_START(trans.block_id);
+      trans.pollrate = queries->queries[i].pollrate;
       memcpy(trans.query, queries->queries[i].query, queries->queries[i].qlen);
       trans.qlen = queries->queries[i].qlen;
       trans.status = queries->queries[i].status; /* N.B.: Already a pointer */
@@ -367,6 +369,7 @@ int execute_read_queries(pdsconn *conn, pds_spi_conn *spi_conn,
         status_trans.protocol = queries->queries[i].protocol;
         status_trans.block_id = queries->queries[i].block_id;
         status_trans.block_start = PDS_GET_BLOCK_START(status_trans.block_id);
+        status_trans.pollrate = queries->queries[i].pollrate;
         status_trans.status = queries->queries[i].status;
         status_trans.errx = &queries->queries[i].errx;
       }
@@ -506,6 +509,9 @@ int execute_read_queries(pdsconn *conn, pds_spi_conn *spi_conn,
         semset(conn->semid, PDS_SEMREL, 0);
         usleep(*pds_rdpause_block);
       }
+
+      /* Pause the specified time from the configuration */
+      usleep(trans.pollrate);
 
       /* Debug option to pause after each query */
       if(dbglvl == 4) sleep(*pds_dbgpause);

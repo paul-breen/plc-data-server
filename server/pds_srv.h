@@ -44,7 +44,7 @@
 #define PDS_LOGMODE	"a"
 
 #define PDS_RDPAUSE_ALL		500000 /* usec refresh pause (read all) */
-#define PDS_RDPAUSE_BLOCK	10000  /* usec refresh pause (read block) */
+#define PDS_RDPAUSE_BLOCK	0      /* usec refresh pause (read block) */
 #define PDS_WRPAUSE		100000 /* usec poll pause (write) */
 #define PDS_DBGPAUSE		2      /* Debug pause (secs.) */
 #define PDS_ONLINE		1      /* PDS online/offline status (bool) */
@@ -122,6 +122,7 @@ typedef struct pdsquery_rec
   unsigned short int port;             /* TCP port */
   char tty_dev[PDS_TTY_DEV_LEN];       /* TTY device */
   char path[PDS_PLC_PATH_LEN];         /* Routing path of PLC */
+  int pollrate;                        /* Block's poll rate (in usecs) */
   unsigned char query[PDS_MAXBUFLEN];  /* Query */
   short int qlen;                      /* Query length */
   unsigned short int *status;          /* Status word pointer */
@@ -145,6 +146,7 @@ typedef struct pdstrans_rec
   unsigned short int protocol;              /* Comms protocol */
   unsigned short int block_id;              /* Block ID */
   pdstag *block_start;                      /* Pointer to 1st tag in block */
+  int pollrate;                             /* Block's poll rate (in usecs) */
 
   unsigned char query[PDS_MAXBUFLEN];       /* Query */
   short int qlen;                           /* Query length */
