@@ -37,6 +37,11 @@
 #define COL_SEP(l)		((l) > 0 ? '|' : ' ')
 #define PRINT_EOL(f)		((f) > 0 ? "<br>" : "\n")
 
+#define DATA_LEN                512
+
+#define TMSTAMP_FMT     	"%Y-%m-%dT%H:%M:%S"
+#define TMSTAMP_LEN     	25
+
 /******************************************************************************
 * plcmm's command line arguments struct definition                            *
 ******************************************************************************/

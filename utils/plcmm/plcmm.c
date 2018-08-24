@@ -240,7 +240,7 @@ int print_data_tag_headers(FILE *os, plcmm_args *args)
           if(args->cgi_mode)
             sprintf(header, "%s<th>%s</th>", header, "MTIME");
           else
-            sprintf(header, "%s%c%-30s", header, COL_SEP(line_len), "MTIME");
+            sprintf(header, "%s%c%-24s", header, COL_SEP(line_len), "MTIME");
           line_len += 31;
         break;
 
@@ -276,7 +276,8 @@ int print_data_tag_headers(FILE *os, plcmm_args *args)
 ******************************************************************************/
 int print_data_tag(FILE *os, pdstag *tag, void *aux)
 {
-  char fqid[PDS_TAG_FQID_LEN] = "\0", mtimestr[31] = "\0", data[512] = "\0";
+  char fqid[PDS_TAG_FQID_LEN] = "\0", mtimestr[TMSTAMP_LEN] = "\0";
+  char data[DATA_LEN] = "\0";
   time_t mtime = 0;
   int retval = -1, nfields = 0, i = 0;
   plcmm_args *args = (plcmm_args *) aux;
@@ -338,12 +339,12 @@ int print_data_tag(FILE *os, pdstag *tag, void *aux)
           case 'm' :
             /* Construct this tag's last modification time as a string */
             mtime = PDStag_get_mtime(tag);
-            strftime(mtimestr, 30, "%c", localtime(&mtime));
+            strftime(mtimestr, TMSTAMP_LEN, TMSTAMP_FMT, localtime(&mtime));
 
             if(args->cgi_mode)
               sprintf(data, "%s<td>%s</td>", data, mtimestr);
             else
-              sprintf(data, "%s%c%-30s", data, COL_SEP(strlen(data)), mtimestr);
+              sprintf(data, "%s%c%-24s", data, COL_SEP(strlen(data)), mtimestr);
           break;
 
           default :
@@ -423,7 +424,7 @@ int print_status_tag_headers(FILE *os, plcmm_args *args)
 
         case 'm' :                     /* Not applicable */
           if(!args->cgi_mode)
-            sprintf(header, "%s%c%-30s", header, COL_SEP(line_len), "");
+            sprintf(header, "%s%c%-24s", header, COL_SEP(line_len), "");
           line_len += 31;
         break;
 
@@ -516,7 +517,7 @@ int print_status_tag(FILE *os, pdstag *tag, void *aux)
 
           case 'm' :                   /* Not applicable */
             if(!args->cgi_mode)
-              sprintf(data, "%s%c%-30s", data, COL_SEP(strlen(data)), "");
+              sprintf(data, "%s%c%-24s", data, COL_SEP(strlen(data)), "");
           break;
 
           default :
