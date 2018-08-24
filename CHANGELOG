@@ -1,4 +1,6 @@
 ### 2.1.3 ###
+- Install the pds-scope.py Python utility program
+- The plcmm program should format tags' mtime as ISO 8601
 - Implement per-block pauses via configuration item
 - The tem utility program now quits on Ctrl-C.  It also prints out the initial
   state of the tag.  These mods. address issues #20 and #21.
