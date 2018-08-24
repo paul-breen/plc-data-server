@@ -60,6 +60,12 @@ To build the Python interface libraries and utilities, type:
 
 ensuring the correct path for your python development header files.
 
+**N.B.**: If both the Tcl and Python bindings require include paths to be specified, then quote them as a single argument to `--with-includes`, for example:
+
+```
+--with-includes="/usr/include/python3.5m /usr/include/tcl8.6"
+```
+
 In addition, the PDS can be network enabled by building the PDS network stub:
 
 ```
@@ -88,6 +94,8 @@ To start the PDS type `pds start`, to stop the PDS type `pds stop`.  An example 
 
 By default, the PLC configuration file is called `plc.cnf`.  It is a plain-text formatted configuration file.
 
+To view the data from your configured PLCs, run the utility program `plcmm`.  See also the other utility programs, installed under the PDS `bin` directory.
+
 #### Example PLC Configuration File
 
 ```
@@ -105,31 +113,31 @@ By default, the PLC configuration file is called `plc.cnf`.  It is a plain-text 
 ###############################################################################
 
 # Communicate via ModBus/TCP/IP to the PLC identified as IP address 10.4.8.190,
-# TCP port 502, Unit ID 0.  Read 2 bits (coils) starting at reference 000101.
-/MB_TCPIP/BREAD/0/10.4.8.190:502/000000/1000
-	pds_mb_read_bit1		000101	0
-	pds_mb_read_bit2		000102	0
+# TCP port 502, Unit ID 0.  Read 2 bits (coils) starting at reference 00101.
+/MB_TCPIP/BREAD/0/10.4.8.190:502/00000/10000
+	pds_mb_read_bit1		00101	0
+	pds_mb_read_bit2		00102	0
 
 # Communicate via ModBus/TCP/IP to the PLC identified as IP address 10.4.8.190,
 # TCP port 502, Unit ID 0.  Write upto 2 bits (coils) starting at reference
-# 000201.
-/MB_TCPIP/BWRITE/0/10.4.8.190:502/000000/1000
-	pds_mb_write_bit1		000201	0
-	pds_mb_write_bit2		000202	0
+# 00201.
+/MB_TCPIP/BWRITE/0/10.4.8.190:502/00000/10000
+	pds_mb_write_bit1		00201	0
+	pds_mb_write_bit2		00202	0
 
 # Communicate via ModBus/TCP/IP to the PLC identified as IP address 10.4.8.190,
 # TCP port 502, Unit ID 0.  Read 2 16 bit words (registers) starting at
-# reference 400101.
-/MB_TCPIP/WREAD/0/10.4.8.190:502/400000/1000
-	pds_mb_read_word1		400101	16
-	pds_mb_read_word2		400102	16
+# reference 40101.
+/MB_TCPIP/WREAD/0/10.4.8.190:502/40000/10000
+	pds_mb_read_word1		40101	16
+	pds_mb_read_word2		40102	16
 
 # Communicate via ModBus/TCP/IP to the PLC identified as IP address 10.4.8.190,
 # TCP port 502, Unit ID 0.  Write upto 2 16 bit words (registers) starting at
-# reference 400201.
-/MB_TCPIP/WWRITE/0/10.4.8.190:502/400000/1000
-	pds_mb_write_word1		400201	16
-	pds_mb_write_word2		400202	16
+# reference 40201.
+/MB_TCPIP/WWRITE/0/10.4.8.190:502/40000/10000
+	pds_mb_write_word1		40201	16
+	pds_mb_write_word2		40202	16
 
 ###############################################################################
 # PLC 2
@@ -138,19 +146,19 @@ By default, the PLC configuration file is called `plc.cnf`.  It is a plain-text 
 # Communicate via ControlNet/TCP/IP to the PLC identified as IP address
 # 10.4.8.191, TCP port 44818, Routing Path 1.0 (backplane, slot 0).  Read 1
 # bit identified as logical_1.
-/CIP_TCPIP/BREAD/1.0/10.4.8.191:44818/logical_1/1000
+/CIP_TCPIP/BREAD/1.0/10.4.8.191:44818/logical_1/10000
 	pds_cip_read_bit0		0	0
 
 # Communicate via ControlNet/TCP/IP to the PLC identified as IP address
 # 10.4.8.191, TCP port 44818, Routing Path 1.0 (backplane, slot 0).  Read 1
 # bit identified as logical_2.
-/CIP_TCPIP/BREAD/1.0/10.4.8.191:44818/logical_2/1000
+/CIP_TCPIP/BREAD/1.0/10.4.8.191:44818/logical_2/10000
 	pds_cip_read_bit1		0	0
 
 # Communicate via ControlNet/TCP/IP to the PLC identified as IP address
 # 10.4.8.191, TCP port 44818, Routing Path 1.0 (backplane, slot 0).  Read 4
 # 16 bit words from the Input_Data_Int[] array
-/CIP_TCPIP/WREAD/1.0/10.4.8.191:44818/Input_Data_Int[]/1000
+/CIP_TCPIP/WREAD/1.0/10.4.8.191:44818/Input_Data_Int[]/10000
 	pds_cip_read_word0		0	16
 	pds_cip_read_word1		1	16
 	pds_cip_read_word5		5	16
@@ -159,7 +167,7 @@ By default, the PLC configuration file is called `plc.cnf`.  It is a plain-text 
 # Communicate via ControlNet/TCP/IP to the PLC identified as IP address
 # 10.4.8.191, TCP port 44818, Routing Path 1.0 (backplane, slot 0).  Write upto
 # 4 16 bit words to the Input_Data_Int[] array
-/CIP_TCPIP/WWRITE/1.0/10.4.8.191:44818/Input_Data_Int[]/1000
+/CIP_TCPIP/WWRITE/1.0/10.4.8.191:44818/Input_Data_Int[]/10000
 	pds_cip_write_word0		0	16
 	pds_cip_write_word1		1	16
 	pds_cip_write_word2		2	16
@@ -168,19 +176,19 @@ By default, the PLC configuration file is called `plc.cnf`.  It is a plain-text 
 # Communicate via ControlNet/TCP/IP to the PLC identified as IP address
 # 10.4.8.191, TCP port 44818, Routing Path 1.0 (backplane, slot 0).  Read from
 # the 16 bit word identified as CIP tag parts
-/CIP_TCPIP/WREAD/1.0/10.4.8.191:44818/parts/1000
+/CIP_TCPIP/WREAD/1.0/10.4.8.191:44818/parts/10000
 	pds_cip_read_parts		0	16
 
 # Communicate via ControlNet/TCP/IP to the PLC identified as IP address
 # 10.4.8.191, TCP port 44818, Routing Path 1.0 (backplane, slot 0).  Write to
 # the 16 bit word identified as CIP tag parts
-/CIP_TCPIP/WWRITE/1.0/10.4.8.191:44818/parts/1000
+/CIP_TCPIP/WWRITE/1.0/10.4.8.191:44818/parts/10000
 	pds_cip_write_parts		0	16
 
 # Communicate via ControlNet/TCP/IP to the PLC identified as IP address
 # 10.4.8.191, TCP port 44818, Routing Path 1.0 (backplane, slot 0).  Read 3
 # 32 bit words (hi-word, lo-word) from the input_dint[] array
-/CIP_TCPIP/LREAD/1.0/10.4.8.191:44818/input_dint[]/1000
+/CIP_TCPIP/LREAD/1.0/10.4.8.191:44818/input_dint[]/10000
 	pds_cip_read_hi_dint0		0	16
 	pds_cip_read_lo_dint0		0	16
 	pds_cip_read_hi_dint1		1	16
@@ -191,7 +199,7 @@ By default, the PLC configuration file is called `plc.cnf`.  It is a plain-text 
 # Communicate via ControlNet/TCP/IP to the PLC identified as IP address
 # 10.4.8.191, TCP port 44818, Routing Path 1.0 (backplane, slot 0).  Write upto
 # 3 32 bit words (hi-word, lo-word) to the input_dint[] array
-/CIP_TCPIP/LWRITE/1.0/10.4.8.191:44818/input_dint[]/1000
+/CIP_TCPIP/LWRITE/1.0/10.4.8.191:44818/input_dint[]/10000
 	pds_cip_write_hi_dint0		0	16
 	pds_cip_write_lo_dint0		0	16
 	pds_cip_write_hi_dint1		1	16
@@ -206,7 +214,7 @@ By default, the PLC configuration file is called `plc.cnf`.  It is a plain-text 
 # Communicate via DataHighway (DF1)/serial/TCP/IP to the PLC identified as
 # IP address 10.4.8.192, TCP port 502, station ID 6.  Read 6 16 bit words
 # starting at the $N10:0 file
-/DH_SERIAL_TCPIP/WREAD/6/10.4.8.192:502/$N10:0/1000
+/DH_SERIAL_TCPIP/WREAD/6/10.4.8.192:502/$N10:0/10000
 	pds_dh_read_word0		0	16
 	pds_dh_read_word1		1	16
 	pds_dh_read_word2		2	16
