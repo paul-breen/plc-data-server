@@ -1172,7 +1172,7 @@ global fulltags
  
    for {set x 0} {$x < [llength $fulltags]} {incr x} {
       set record [lindex $fulltags $x]
-      set tagname [lindex $record 0]
+      set tagname [string trim [lindex $record 0]]
       if { $match == 0 } {
          # Exact match
          if { [string compare $searchstr $tagname] == 0 } {
