@@ -207,7 +207,7 @@ int parse_pds_cmdln(int argc, char *argv[], pds_cmdln *args)
   args->key = (key_t) PDS_IPCKEY;
   args->runmode = 0;
 
-  while((opt = getopt(argc, argv, "D:c:L:l:k:r:sd::vh")) != -1)
+  while((opt = getopt(argc, argv, "D:c:L:l:k:r:S:sd::vh")) != -1)
   {
     switch(opt)
     {
@@ -265,10 +265,16 @@ int parse_pds_cmdln(int argc, char *argv[], pds_cmdln *args)
         args->runmode |= PDS_RM_QUERY_STATUS;
       break; 
 
+      /* Set initial value for the given SPI tag */
+      case 'S' :
+        if(optarg)
+          init_SPI_tag(optarg);
+      break;
+
       /* The server's command line help */
       case 'h' :
         printf("Usage: %s [OPTIONS]\n"
-"Daemon to make PLC data available to client programs\n"
+"Daemon to make PLC data available to client programs\n\n"
 "  -D data_dir -- the path to the PDS PLC config dir (default = %s)\n"
 "  -c filename -- name of the PDS PLC config file (default = %s)\n"
 "  -L log_dir -- the path to the PDS log dir (default = %s)\n"
@@ -278,6 +284,7 @@ int parse_pds_cmdln(int argc, char *argv[], pds_cmdln *args)
 "  the semaphore is released after ALL blocks in the config\n"
 "  are refreshed or after each BLOCK in the config\n"
 "  -s -- run a PLC status query before each data query\n"
+"  -S name=value -- set an initial value for the given SPI tag\n"
 "  -d[1-4] -- debug (and optional level)\n"
 "  level 4 gives a %d second pause between each read query\n"
 "  -h -- print this help text\n",
@@ -386,5 +393,77 @@ char* construct_file_path(char *dir, char *filename, char dirsep)
   }
 
   return path;
+}
+
+
+
+/******************************************************************************
+* Function to split a string into n tokens on a given delimiter               *
+*                                                                             *
+* Pre-condition:  The string, delimiter and the maximum number of tokens to   *
+*                 extract from the string are passed to the function          *
+* Post-condition: The array of tokens is returned or if an error occurred, a  *
+*                 null is returned                                            *
+******************************************************************************/
+char** split(char *s, char *delim, int n)
+{
+  int i = 0;
+  char *cp = NULL, **tokens;
+
+  if(!(tokens = malloc(n)))
+  {
+    err(errout, "%s: memory allocation error\n", PROGNAME);
+    return NULL;
+  }
+  else
+  {
+    for(i = 0, cp = s; i < n; cp = NULL)
+    {
+      if(!(tokens[i++] = (char *) strtok(cp, delim)))
+        break;
+    }
+  }
+
+  return tokens;
+}
+
+
+
+/******************************************************************************
+* Function to initialise an SPI tag from a key-value pair string              *
+*                                                                             *
+* Pre-condition:  The SPI tag key and value are passed as a                   *
+*                 delimiter-separated string                                  *
+* Post-condition: The SPI tag value is initialised in the global SPI tag list *
+******************************************************************************/
+int init_SPI_tag(char *kvpair)
+{
+  int i = 0, found = 0;
+  char **kv;
+
+  if((kv = split(kvpair, PDS_SPI_KV_DELIM, PDS_SPI_KV_N_TOKENS)))
+  {
+    if(kv[0] != NULL && kv[1] != NULL)
+    {
+      for(i = 0; i < __spi_tag_list.ntags; i++)
+      {
+        if(strcmp(__spi_tag_list.tags[i].name, kv[0]) == 0)
+        {
+          err(errout, "%s: initialising SPI tag %s to %d\n", PROGNAME, kv[0], atoi(kv[1]));
+          __spi_tag_list.tags[i].value = atoi(kv[1]);
+          found = 1;
+        }
+      }
+      if(!found)
+        err(errout, "%s: unrecognised SPI tag %s\n", PROGNAME, kv[0]);
+    }
+    else
+    {
+      err(errout, "%s: error parsing SPI tag KV pair %s\n", PROGNAME, kvpair);
+    }
+    free(kv);
+  }
+
+  return (found > 0 ? 0 : -1);
 }
 

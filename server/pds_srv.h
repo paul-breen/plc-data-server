@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <signal.h>
+#include <string.h>
 
 #include <daemon.h>
 #include <debug.h>
@@ -74,6 +75,9 @@
 
 #define PDS_RM_STATUS_BITMASK		0x04
 #define PDS_GET_RM_STATUS(r)		((r) & PDS_RM_STATUS_BITMASK)
+
+#define PDS_SPI_KV_DELIM                "="
+#define PDS_SPI_KV_N_TOKENS             2
 
 /******************************************************************************
 * Structure definitions                                                       *
@@ -258,6 +262,25 @@ char* get_plc_cnf_filename(pds_cmdln args);
 *                 null is returned                                            *
 ******************************************************************************/
 char* construct_file_path(char *dir, char *filename, char dirsep);
+
+/******************************************************************************
+* Function to split a string into n tokens on a given delimiter               *
+*                                                                             *
+* Pre-condition:  The string, delimiter and the maximum number of tokens to   *
+*                 extract from the string are passed to the function          *
+* Post-condition: The array of tokens is returned or if an error occurred, a  *
+*                 null is returned                                            *
+******************************************************************************/
+char** split(char *s, char *delim, int n);
+
+/******************************************************************************
+* Function to initialise an SPI tag from a key-value pair string              *
+*                                                                             *
+* Pre-condition:  The SPI tag key and value are passed as a                   *
+*                 delimiter-separated string                                  *
+* Post-condition: The SPI tag value is initialised in the global SPI tag list *
+******************************************************************************/
+int init_SPI_tag(char *kvpair);
 
 /******************************************************************************
 * Function to initialise the server connection                                *
