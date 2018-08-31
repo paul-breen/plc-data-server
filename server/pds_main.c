@@ -198,29 +198,50 @@ int parse_pds_cmdln(int argc, char *argv[], pds_cmdln *args)
   extern int opterr, optind;
 
   opterr = 0;                     /* Turn off getopt()'s error messages */
+
+  /* Setup some defaults */
+  args->dir = PLC_CNF_DATA_DIR;
+  args->cnf_filename = PLC_CNF_FILENAME;
+  args->log_dir = PLC_CNF_DATA_DIR;
+  args->log_filename = PDS_LOGFILE;
+  args->key = (key_t) PDS_IPCKEY;
   args->runmode = 0;
 
-  while((opt = getopt(argc, argv, "D:k:r:sd::vh")) != -1)
+  while((opt = getopt(argc, argv, "D:c:L:l:k:r:sd::vh")) != -1)
   {
     switch(opt)
     {
-      /* The server's data/auxillary files directory switch */
+      /* The server's data/auxillary files directory */
       case 'D' :
         if(optarg)
           args->dir = optarg;
-        else
-          args->dir = (char *) NULL;
       break; 
 
-      /* The server's connection key switch */
+      /* The server's alternative configuration filename */
+      case 'c' :
+        if(optarg)
+          args->cnf_filename = optarg;
+      break; 
+
+      /* The server's log file directory */
+      case 'L' :
+        if(optarg)
+          args->log_dir = optarg;
+      break; 
+
+      /* The server's alternative log filename */
+      case 'l' :
+        if(optarg)
+          args->log_filename = optarg;
+      break; 
+
+      /* The server's connection key */
       case 'k' :
         if(optarg)
           args->key = atoi(optarg);
-        else
-          args->key = 0;
       break; 
 
-      /* The server's refresh mode switch */
+      /* The server's refresh mode */
       case 'r' :
         if(optarg)
         {
@@ -238,32 +259,34 @@ int parse_pds_cmdln(int argc, char *argv[], pds_cmdln *args)
         }
       break; 
 
-      /* The server's query status mode switch */
+      /* The server's query status mode */
       case 's' :
         /* Set query status bit in runmode */
         args->runmode |= PDS_RM_QUERY_STATUS;
       break; 
 
-      /* The server's command line help switch */
+      /* The server's command line help */
       case 'h' :
-        printf("Usage: %s -D data_dir -k IPC_key -r {all|block}"
-        " -s -d[1-4] -v -h\n\n"
-        "  -D data_dir -- the path to the PDS PLC config file\n"
-        "  -k IPC_key -- an alternative to the standard PDS IPC key\n"
-        "  (default = %d)\n"
-        "  -r {all|block} -- the default refresh mode\n"
-        "  the semaphore is released after ALL blocks in the config\n"
-        "  are refreshed or after each BLOCK in the config\n"
-        "  (default = all)\n"
-        "  -s -- switch to run a PLC status query before each data query\n"
-        "  -d[1-4] -- debug switch (and optional level)\n"
-        "  level 4 gives a %d second pause between each read query\n"
-        "  -h -- switch to print this help text\n",
-        PROGNAME, PDS_IPCKEY, PDS_DBGPAUSE);
+        printf("Usage: %s [OPTIONS]\n"
+"Daemon to make PLC data available to client programs\n"
+"  -D data_dir -- the path to the PDS PLC config dir (default = %s)\n"
+"  -c filename -- name of the PDS PLC config file (default = %s)\n"
+"  -L log_dir -- the path to the PDS log dir (default = %s)\n"
+"  -l filename -- name for the PDS log file (default = %s)\n"
+"  -k IPC_key -- an alternative to the standard PDS IPC key (default = %d)\n"
+"  -r {all|block} -- the default refresh mode (default = all)\n"
+"  the semaphore is released after ALL blocks in the config\n"
+"  are refreshed or after each BLOCK in the config\n"
+"  -s -- run a PLC status query before each data query\n"
+"  -d[1-4] -- debug (and optional level)\n"
+"  level 4 gives a %d second pause between each read query\n"
+"  -h -- print this help text\n",
+        PROGNAME, PLC_CNF_DATA_DIR, PLC_CNF_FILENAME, PLC_CNF_DATA_DIR,
+        PDS_LOGFILE, PDS_IPCKEY, PDS_DBGPAUSE);
         exit(0);
       break; 
 
-      /* Debug switch.  Global debug flag is set */
+      /* Debug.  Global debug flag is set */
       case 'd' :
         puts("Started in debug mode");
         SET_DBG_FLAG(1);
@@ -275,8 +298,7 @@ int parse_pds_cmdln(int argc, char *argv[], pds_cmdln *args)
         }
       break;
 
-      /* Version switch.  Prints program name, version, date & time and then
-         exits */
+      /* Version.  Prints program name, version, date & time and then exits */
       case 'v' :
         printf("%s : %s %s\n", argv[0], VERSION, CREATED);
         exit(0);
@@ -317,29 +339,7 @@ int parse_pds_cmdln(int argc, char *argv[], pds_cmdln *args)
 ******************************************************************************/
 char* get_log_filename(pds_cmdln args)
 {
-  int flen = strlen(PDS_LOGFILE) + 2;       /* Filename + dirsep + strterm */
-  int dlen = 0;
-  char *filename;
-
-  if(args.dir)
-  {
-    dlen = strlen(args.dir);
-
-    if(!(filename = (char *) malloc(dlen + flen)))
-      return (char *) NULL;
-
-    memset(filename, 0, (dlen + flen));
-
-    /* If dir has no trailing directory separator, then add one */
-    if(args.dir[dlen - 1] != PLC_CNF_DIRSEP)
-      sprintf(filename, "%s%c%s", args.dir, PLC_CNF_DIRSEP, PDS_LOGFILE);
-    else
-      sprintf(filename, "%s%s", args.dir, PDS_LOGFILE);
-
-    return filename;
-  }
-  else
-    return (char *) PDS_LOGFILE;
+  return construct_file_path(args.log_dir, args.log_filename, PLC_CNF_DIRSEP);
 }
 
 
@@ -354,28 +354,37 @@ char* get_log_filename(pds_cmdln args)
 ******************************************************************************/
 char* get_plc_cnf_filename(pds_cmdln args)
 {
-  int flen = strlen(PLC_CNF_FILENAME) + 2;  /* Filename + dirsep + strterm */
-  int dlen = 0;
-  char *filename;
+  return construct_file_path(args.dir, args.cnf_filename, PLC_CNF_DIRSEP);
+}
 
-  if(args.dir)
+
+
+/******************************************************************************
+* Function to construct a file path from directory and filename               *
+*                                                                             *
+* Pre-condition:  The directory, the filename, and the directory separator    *
+*                 character are passed to the function                        *
+* Post-condition: The full file path is returned or if an error occurred, a   *
+*                 null is returned                                            *
+******************************************************************************/
+char* construct_file_path(char *dir, char *filename, char dirsep)
+{
+  int len = 0;
+  char *path = (char *) NULL;
+
+  len = strlen(dir) + strlen(filename) + 2;      /* Path + dirsep + strterm */
+
+  if((path = (char *) malloc(len)))
   {
-    dlen = strlen(args.dir);
-
-    if(!(filename = (char *) malloc(dlen + flen)))
-      return (char *) NULL;
-
-    memset(filename, 0, (dlen + flen));
+    memset(path, 0, len);
 
     /* If dir has no trailing directory separator, then add one */
-    if(args.dir[dlen - 1] != PLC_CNF_DIRSEP)
-      sprintf(filename, "%s%c%s", args.dir, PLC_CNF_DIRSEP, PLC_CNF_FILENAME);
+    if(dir[strlen(dir) - 1] != dirsep)
+      snprintf(path, len, "%s%c%s", dir, dirsep, filename);
     else
-      sprintf(filename, "%s%s", args.dir, PLC_CNF_FILENAME);
-
-    return filename;
+      snprintf(path, len, "%s%s", dir, filename);
   }
-  else
-    return (char *) PLC_CNF_FILENAME;
+
+  return path;
 }
 

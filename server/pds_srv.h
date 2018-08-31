@@ -85,6 +85,9 @@
 typedef struct pds_cmdln_rec
 {
   char *dir;                      /* The server's data directory */
+  char *cnf_filename;             /* The server's configuration file */
+  char *log_dir;                  /* The server's log directory */
+  char *log_filename;             /* The server's log file */
   key_t key;                      /* The server's connection key */
   unsigned int runmode;           /* The server's runmode */
 } pds_cmdln;
@@ -245,6 +248,16 @@ char* get_log_filename(pds_cmdln args);
 *                 null is returned                                            *
 ******************************************************************************/
 char* get_plc_cnf_filename(pds_cmdln args);
+
+/******************************************************************************
+* Function to construct a file path from directory and filename               *
+*                                                                             *
+* Pre-condition:  The directory, the filename, and the directory separator    *
+*                 character are passed to the function                        *
+* Post-condition: The full file path is returned or if an error occurred, a   *
+*                 null is returned                                            *
+******************************************************************************/
+char* construct_file_path(char *dir, char *filename, char dirsep);
 
 /******************************************************************************
 * Function to initialise the server connection                                *
