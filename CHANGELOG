@@ -1,3 +1,8 @@
+### 2.1.4 ###
+- Optionally pass configuration filename on the command line of chkcnf.tcl
+- Option to initialise an SPI tag to a given value for pdsd
+- Options to pass alternative config file, log file, and log dir to pdsd
+- Bugfix for the 'exact' tagname search in chkcnf.tcl
 ### 2.1.3 ###
 - Install the pds-scope.py Python utility program
 - The plcmm program should format tags' mtime as ISO 8601
