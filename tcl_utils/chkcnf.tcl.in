@@ -150,7 +150,7 @@ global selectedarray IPCKEY READPLC pdsconn PRINT_CURR_VAL_TOP
 # Function to extract the directory from the full filename
 ###############################################################################
 proc dirpath {filename} {
-   set x -1
+   set pos -1
 
    # Find the last slash char
    for {set x 0} {$x < [string length $filename]} {incr x} {
@@ -240,8 +240,8 @@ proc EnableValidFileFunctionality {filename} {
   .mainmenu.filemenu entryconfigure 1 -state normal
   .mainmenu.editmenu entryconfigure 0 -state normal
   .mainmenu.plcmenu entryconfigure 0 -state normal
-  bind . <Control-R> {ReloadFile $filename}
-  bind . <Control-r> {ReloadFile $filename}
+  bind . <Control-R> {LoadFile $filename}
+  bind . <Control-r> {LoadFile $filename}
   bind . <Control-C> {ConnectPLC}
   bind . <Control-c> {ConnectPLC}
   bind . <Control-F> {SearchBox}
@@ -251,20 +251,21 @@ proc EnableValidFileFunctionality {filename} {
 
 
 ###############################################################################
-# Function to select a file to work on
+# Function to load a file to work on
 ###############################################################################
-proc ReloadFile {filename} {
-   global blockerr selectedarray
-
-   set blockerr 0
-   set selectedarray {}
+proc LoadFile {filename} {
+   global blockerr selectedarray dir
 
    if { [string length $filename] != 0 } {
+      set blockerr 0
+      set selectedarray {}
+      set dir [dirpath $filename]
       set fd [fileopen $filename r]
 
       if { [string compare $fd {error}] != 0 } {
          ValidateFile $fd
          close $fd
+         EnableValidFileFunctionality $filename
       }
    }
 }
@@ -288,16 +289,7 @@ proc ChooseFile {} {
       # No file chosen so reset to last one
       set filename $oldfilename 
    } else {
-      set blockerr 0
-      set selectedarray {}
-      set dir [dirpath $filename]
-      set fd [fileopen $filename r]
-
-      if { [string compare $fd {error}] != 0 } {
-         ValidateFile $fd
-         close $fd
-         EnableValidFileFunctionality $filename
-      }
+      LoadFile $filename
    }
 }
 
@@ -1461,7 +1453,7 @@ proc MainDisplay {base} {
   .mainmenu add cascade -menu .mainmenu.aboutmenu -label Help -underline 0
   menu .mainmenu.filemenu -tearoff 0
   .mainmenu.filemenu add command -command {ChooseFile} -label {Open} -underline 0 -accelerator {Ctrl+O}
-  .mainmenu.filemenu add command -command {ReloadFile $filename} -label {Reload} -underline 0 -accelerator {Ctrl+R}
+  .mainmenu.filemenu add command -command {LoadFile $filename} -label {Reload} -underline 0 -accelerator {Ctrl+R}
   .mainmenu.filemenu add command -command {CloseApp} -label {Exit} -underline 1 -accelerator {Ctrl+X}
   .mainmenu.filemenu entryconfigure 1 -state disabled
   menu .mainmenu.editmenu -tearoff 0
@@ -1562,15 +1554,20 @@ set match 1
 set pds_lib_dir $pds_dir/lib
 
 source $pds_lib_dir/libtcl.tcl
-
-if {$argc != 0} {
-  puts "Error! Wrong number of arguments supplied!\n"
-  puts "Usage: chkcnf.tcl"
-  exit
-}
-
 load $pds_lib_dir/libpds_tcl.so
- 
-MainDisplay .
-ChooseFile
 
+if {$argc > 0} {
+  set arg [lindex $argv 0]
+
+  if {([string compare $arg {--help}] == 0) || ([string compare $arg {-h}] == 0)} {
+    puts "Usage: chkcnf.tcl \[config_file\]"
+    exit
+  } else {
+    MainDisplay .
+    LoadFile $arg
+  }
+} else {
+  MainDisplay .
+  ChooseFile
+}
+ 
