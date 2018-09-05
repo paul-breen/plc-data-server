@@ -1564,7 +1564,7 @@ if {$argc > 0} {
     exit
   } else {
     MainDisplay .
-    LoadFile $arg
+    set filename [LoadFile $arg]
   }
 } else {
   MainDisplay .
